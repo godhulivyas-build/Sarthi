@@ -55,24 +55,27 @@ Sarthi/
 *((https://drive.google.com/file/d/1gxPvkx-5U-ZHlvnnQy6I0EJWB_3NLI3G/view?usp=sharing))*  
 
 
-## 🛠 Setup & Installation
 
-### 1) Clone the repository
+---
 
-```bash
-git clone https://github.com/godhulivyas-build/Sarthi.git
-cd Sarthi
-###2) Create & activate a virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Linux / Mac
-venv\Scripts\activate     # Windows
+# 📄 Product Requirements Document (PRD)
 
-###3) Install dependencies
-pip install -r requirements.txt
+```markdown
+## 📄 Product Requirements Document (PRD)
 
-###4) Run the application
-python app.py
+The complete Product Requirements Document (PRD) for **Sarthi** was created to define:
 
-The app should now be available at:
+- Problem statement and user personas
+- User pain points and insights from 30+ interviews
+- Functional and non-functional requirements
+- MVP scope and feature prioritization
+- Success metrics and validation plan
 
-http://localhost:5000
+---
+
+🔗 **PRD Link:**  
+*((https://docs.google.com/document/d/1WwEHQTjtLa1aWeLYSw8NfWCBd-5YmnCybCOSIZPMuSg/edit?usp=sharing))*
+
+
+
+
