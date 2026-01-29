@@ -5,7 +5,7 @@ By combining user research insights with digital workflows, Sarthi improves deli
 
 ---
 
-## 🎯 Product Vision
+##  Product Vision
 
 Farmers and small traders often struggle with:
 - Opaque pricing
@@ -21,7 +21,7 @@ Farmers and small traders often struggle with:
 
 ---
 
-## 🧠 Key Features
+##  Key Features
 
 - **User interviewing & research insights**
 - **Order creation and assignment**
@@ -49,30 +49,11 @@ Sarthi/
 
 ---
 
-## 🚀 Live Demo / Video Walkthrough
+## Live Demo / Video Walkthrough
 
 🔗 **Video demonstration:**  
-*(Add your video link here — e.g., YouTube / Drive / Notion)*  
-https://youtu.be/YOUR_VIDEO_LINK
+*((https://drive.google.com/file/d/1gxPvkx-5U-ZHlvnnQy6I0EJWB_3NLI3G/view?usp=sharing))*  
 
----
-
-## 🖼 Screenshots
-
-Below are some screenshots of the working system:
-
-### 1) **Home / Dashboard**
-![Dashboard](screenshots/dashboard.png)
-
-### 2) **Order Creation Flow**
-![Order Creation](screenshots/order_creation.png)
-
-### 3) **Delivery Tracking Page**
-![Tracking](screenshots/tracking.png)
-
-*(Replace with your actual screenshots filenames)*
-
----
 
 ## 🛠 Setup & Installation
 
@@ -81,3 +62,17 @@ Below are some screenshots of the working system:
 ```bash
 git clone https://github.com/godhulivyas-build/Sarthi.git
 cd Sarthi
+###2) Create & activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Linux / Mac
+venv\Scripts\activate     # Windows
+
+###3) Install dependencies
+pip install -r requirements.txt
+
+###4) Run the application
+python app.py
+
+The app should now be available at:
+
+http://localhost:5000
