@@ -61,8 +61,6 @@ Sarthi/
 # 📄 Product Requirements Document (PRD)
 
 ```markdown
-## 📄 Product Requirements Document (PRD)
-
 The complete Product Requirements Document (PRD) for **Sarthi** was created to define:
 
 - Problem statement and user personas
@@ -74,7 +72,39 @@ The complete Product Requirements Document (PRD) for **Sarthi** was created to d
 ---
 
 🔗 **PRD Link:**  
-*((https://docs.google.com/document/d/1WwEHQTjtLa1aWeLYSw8NfWCBd-5YmnCybCOSIZPMuSg/edit?usp=sharing))*
+https://docs.google.com/document/d/1WwEHQTjtLa1aWeLYSw8NfWCBd-5YmnCybCOSIZPMuSg/edit?usp=sharing
+
+
+
+🛠 Setup & Installation
+1) Clone the repository
+git clone https://github.com/godhulivyas-build/Sarthi.git
+cd Sarthi
+
+2) Create & activate a virtual environment
+python3 -m venv venv
+
+
+Linux / macOS
+
+source venv/bin/activate
+
+
+Windows
+
+venv\Scripts\activate
+
+3) Install dependencies
+pip install -r requirements.txt
+
+4) Run the application
+python app.py
+
+
+The application will be available at:
+
+http://localhost:5000
+
 
 
 
