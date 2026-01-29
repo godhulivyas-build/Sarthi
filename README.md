@@ -55,7 +55,6 @@ Sarthi/
 *((https://drive.google.com/file/d/1gxPvkx-5U-ZHlvnnQy6I0EJWB_3NLI3G/view?usp=sharing))*  
 
 
-
 ---
 
 # 📄 Product Requirements Document (PRD)
@@ -71,7 +70,7 @@ The complete Product Requirements Document (PRD) for **Sarthi** was created to d
 
 ---
 
-🔗 **PRD Link:**  
+🔗 PRD Link:  
 https://docs.google.com/document/d/1WwEHQTjtLa1aWeLYSw8NfWCBd-5YmnCybCOSIZPMuSg/edit?usp=sharing
 
 
