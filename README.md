@@ -74,6 +74,14 @@ The complete Product Requirements Document (PRD) for **Sarthi** was created to d
 https://docs.google.com/document/d/1WwEHQTjtLa1aWeLYSw8NfWCBd-5YmnCybCOSIZPMuSg/edit?usp=sharing
 
 
+<img width="1730" height="769" alt="image" src="https://github.com/user-attachments/assets/390df65d-1b50-4dd3-b4d9-cfd609583005" />
+
+<img width="1914" height="652" alt="image" src="https://github.com/user-attachments/assets/84f51083-4076-4256-acbd-622289d1fefe" />
+
+<img width="569" height="407" alt="image" src="https://github.com/user-attachments/assets/bb780b6d-88ef-4618-84b6-e14445f1ac74" />
+
+<img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/a541b0d9-7aa0-4630-b95a-48f8723f4722" />
+
 
 🛠 Setup & Installation
 1) Clone the repository
