@@ -42,6 +42,20 @@ export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, ti
           </button>
           <button
             type="button"
+            onClick={() => setLang('kn')}
+            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'kn' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
+          >
+            ಕನ್
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('te')}
+            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'te' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
+          >
+            తె
+          </button>
+          <button
+            type="button"
             onClick={() => setLang('en')}
             className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'en' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
           >

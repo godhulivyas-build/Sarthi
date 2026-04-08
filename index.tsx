@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { LanguageProvider } from './i18n/I18nContext';
+import { AppStateProvider } from './state/AppState';
+import { VoiceAssistantProvider } from './voice/VoiceAssistantProvider';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -11,8 +12,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
+    <AppStateProvider>
+      <VoiceAssistantProvider>
+        <App />
+      </VoiceAssistantProvider>
+    </AppStateProvider>
   </React.StrictMode>
 );

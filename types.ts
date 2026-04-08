@@ -1,6 +1,7 @@
+export type SaarthiUserRole = 'farmer' | 'transporter' | 'buyer';
+
 export enum UserRole {
   FARMER = 'Farmer (Kisan)',
-  FPO = 'FPO / Admin',
   BUYER = 'Buyer (Vyapari)',
   TRANSPORTER = 'Transporter'
 }
@@ -10,6 +11,17 @@ export enum AppScreen {
   PREFERENCES = 'PREFERENCES',
   DASHBOARD = 'DASHBOARD'
 }
+
+export type SaarthiScreen = 'landing' | 'dashboard';
+
+export type FarmerDashboardView = 'home' | 'book_vehicle' | 'my_requests';
+export type TransporterDashboardView = 'home' | 'jobs' | 'my_trips';
+export type BuyerDashboardView = 'home' | 'browse' | 'orders';
+
+export type SaarthiDashboardView =
+  | { role: 'farmer'; view: FarmerDashboardView }
+  | { role: 'transporter'; view: TransporterDashboardView }
+  | { role: 'buyer'; view: BuyerDashboardView };
 
 export enum DashboardView {
   HOME = 'HOME',
