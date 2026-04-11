@@ -60,14 +60,14 @@ export const BookingView: React.FC<BookingViewProps> = ({ onBook }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input 
               label="Source Location" 
-              placeholder="e.g. Nashik Mandi"
+              placeholder="e.g. Indore Mandi"
               value={formData.source}
               onChange={(e) => setFormData({...formData, source: e.target.value})}
               required
             />
             <Input 
               label="Destination" 
-              placeholder="e.g. Vashi Market, Mumbai"
+              placeholder="e.g. Bhopal APMC"
               value={formData.destination}
               onChange={(e) => setFormData({...formData, destination: e.target.value})}
               required

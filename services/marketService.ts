@@ -5,8 +5,8 @@ export const getMarketRates = async (location: string, primaryCrop: string): Pro
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 800));
 
-  const crops = [primaryCrop || 'Onion', 'Tomato', 'Potato', 'Wheat', 'Soybean'];
-  const mandis = [location || 'Local Mandi', 'Vashi APMC', 'Lasalgaon', 'Azadpur', 'Pune APMC'];
+  const crops = [primaryCrop || 'Soybean', 'Wheat', 'Gram', 'Onion', 'Garlic'];
+  const mandis = [location || 'Local Mandi', 'Indore Mandi', 'Neemuch Mandi', 'Mandsaur Mandi', 'Bhopal APMC'];
 
   const getRandomTrend = () => {
     const r = Math.random();
@@ -24,9 +24,11 @@ export const getMarketRates = async (location: string, primaryCrop: string): Pro
     const mandi = isPrimary ? (location || 'Local Mandi') : mandis[i % mandis.length];
     
     // Base prices roughly
-    const basePrice = crop.toLowerCase().includes('onion') ? 2200 : 
-                      crop.toLowerCase().includes('tomato') ? 1800 :
-                      crop.toLowerCase().includes('soybean') ? 4800 : 3000;
+    const basePrice = crop.toLowerCase().includes('soybean') ? 4800 :
+                      crop.toLowerCase().includes('wheat') ? 2275 :
+                      crop.toLowerCase().includes('gram') ? 5200 :
+                      crop.toLowerCase().includes('garlic') ? 12000 :
+                      crop.toLowerCase().includes('onion') ? 2200 : 3000;
 
     const variation = Math.floor(Math.random() * 400) - 200;
     const price = basePrice + variation;
@@ -53,10 +55,10 @@ export const getDiscoveryListings = async (crop: string): Promise<CropDiscoveryL
 
   // Base listings
   const baseData = [
-    { mandi: 'Lasalgaon APMC', state: 'Maharashtra', dist: 45, price: 2100 },
-    { mandi: 'Vashi Market', state: 'Maharashtra', dist: 180, price: 2350 },
-    { mandi: 'Azadpur Mandi', state: 'Delhi', dist: 1200, price: 1800 },
-    { mandi: 'Kolar APMC', state: 'Karnataka', dist: 850, price: 1950 },
+    { mandi: 'Indore Mandi', state: 'Madhya Pradesh', dist: 25, price: 2100 },
+    { mandi: 'Neemuch Mandi', state: 'Madhya Pradesh', dist: 90, price: 2350 },
+    { mandi: 'Mandsaur Mandi', state: 'Madhya Pradesh', dist: 110, price: 1800 },
+    { mandi: 'Bhopal APMC', state: 'Madhya Pradesh', dist: 190, price: 1950 },
     { mandi: 'Local Farm Aggregator', state: 'Nearby', dist: 12, price: 2200 },
   ];
 
@@ -68,11 +70,9 @@ export const getDiscoveryListings = async (crop: string): Promise<CropDiscoveryL
     const tags: ('Cheapest' | 'Fastest' | 'Best Value')[] = [];
     
     // Logic for tags will be applied after generation, but let's pre-seed based on knowns
-    if (item.mandi.includes('Azadpur')) tags.push('Cheapest');
+    if (item.mandi.includes('Mandsaur')) tags.push('Cheapest');
     if (item.mandi.includes('Local')) tags.push('Fastest');
-    // "Best Value" usually balances price + logistics. 
-    // Let's say Kolar is best value here for demo purposes.
-    if (item.mandi.includes('Kolar')) tags.push('Best Value');
+    if (item.mandi.includes('Neemuch')) tags.push('Best Value');
 
     return {
       id: `d-${idx}`,

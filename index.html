@@ -1,13 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saarthi Agri-Logistics</title>
+    <title>Sarthi Setu — सारथी सेतु</title>
+    <meta name="description" content="Farm se Market tak. Mandi prices, buyers and transport in one simple app for MP farmers." />
+    <meta name="theme-color" content="#16a34a" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body { font-family: 'Inter', sans-serif; }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+      .anim-fade-up { animation: fadeInUp 0.6s ease-out both; }
+      .anim-fade { animation: fadeIn 0.5s ease-out both; }
+      .anim-scale { animation: scaleIn 0.5s ease-out both; }
+      .anim-delay-1 { animation-delay: 0.1s; }
+      .anim-delay-2 { animation-delay: 0.2s; }
+      .anim-delay-3 { animation-delay: 0.3s; }
+      .anim-delay-4 { animation-delay: 0.4s; }
+      .anim-delay-5 { animation-delay: 0.5s; }
+      @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+      .ticker-scroll { animation: ticker 30s linear infinite; }
+      .ticker-scroll:hover { animation-play-state: paused; }
     </style>
   <script type="importmap">
 {

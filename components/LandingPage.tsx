@@ -6,9 +6,12 @@ import { VoiceMic } from './VoiceMic';
 import { SaathiDidi } from './SaathiDidi';
 import { AgriImages } from './landing/AgriImages';
 import { WhatsAppFloat } from './WhatsAppFloat';
-import { Tractor, ShoppingBag, Truck, BadgeCheck, TrendingUp, MapPin, Radar } from 'lucide-react';
+import LiveMapSection from './landing/LiveMapSection';
+import MandiPriceTicker from './landing/MandiPriceTicker';
+import { Tractor, ShoppingBag, Truck, BadgeCheck, TrendingUp, MapPin, Bell, Phone, Mail } from 'lucide-react';
 import type { TranslationKey } from '../i18n/translations';
 import { useAppState } from '../state/AppState';
+import { CONTACT } from '../config/contact';
 
 const roles: {
   role: UserRole;
@@ -22,103 +25,114 @@ const roles: {
   { role: UserRole.TRANSPORTER, icon: Truck, titleKey: 'landing.roleTransporter', descKey: 'landing.roleTransporterDesc', color: 'bg-orange-100 text-orange-800 border-orange-200' },
 ];
 
+const advantages: { icon: typeof BadgeCheck; titleKey: TranslationKey; descKey: TranslationKey; iconColor: string }[] = [
+  { icon: BadgeCheck, titleKey: 'landing.adv.booking', descKey: 'landing.adv.bookingDesc', iconColor: 'text-green-600' },
+  { icon: TrendingUp, titleKey: 'landing.adv.price', descKey: 'landing.adv.priceDesc', iconColor: 'text-indigo-600' },
+  { icon: MapPin, titleKey: 'landing.adv.local', descKey: 'landing.adv.localDesc', iconColor: 'text-orange-600' },
+  { icon: Bell, titleKey: 'landing.adv.updates', descKey: 'landing.adv.updatesDesc', iconColor: 'text-purple-600' },
+];
+
+const steps: { titleKey: TranslationKey; descKey: TranslationKey }[] = [
+  { titleKey: 'landing.step1', descKey: 'landing.step1Desc' },
+  { titleKey: 'landing.step2', descKey: 'landing.step2Desc' },
+  { titleKey: 'landing.step3', descKey: 'landing.step3Desc' },
+];
+
 export const LandingPage: React.FC = () => {
   const { t } = useI18n();
   const { setCurrentScreen, setUserRoleFromEnum } = useAppState();
   const joinRef = React.useRef<HTMLDivElement | null>(null);
-  const [showJoin, setShowJoin] = React.useState(false);
+
+  const scrollToJoin = () =>
+    setTimeout(() => joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 
   return (
-    <ScreenChrome title={t('app.name')}>
-      <div className="p-4 pb-28 max-w-3xl mx-auto w-full space-y-10">
+    <ScreenChrome>
+      <div className="pb-28 max-w-3xl mx-auto w-full">
         {/* HERO */}
-        <section className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl p-6 text-white shadow-lg overflow-hidden relative">
+        <section className="bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-6 sm:p-8 text-white overflow-hidden relative">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="anim-fade-up">
               <p className="text-green-100 font-semibold text-sm">{t('landing.tagline')}</p>
               <h1 className="text-3xl sm:text-4xl font-extrabold mt-2 leading-tight">
-                Farm se Market tak – Seedha aur Sasta
+                {t('landing.heroTitle')}
               </h1>
               <p className="text-green-100 mt-3 text-base leading-relaxed max-w-xl">
                 {t('landing.whatBody')}
               </p>
               <button
                 type="button"
-                onClick={() => {
-                  setShowJoin(true);
-                  setTimeout(() => joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-                }}
-                className="mt-5 min-h-[56px] px-6 rounded-2xl bg-white text-green-800 font-extrabold text-lg shadow-sm active:scale-[0.99]"
+                onClick={scrollToJoin}
+                className="mt-5 min-h-[56px] px-8 rounded-2xl bg-white text-green-800 font-extrabold text-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
               >
-                Start Now
+                {t('landing.startNow')}
               </button>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
-                <span className="bg-white/20 px-3 py-1 rounded-full">50,000+ Farmers</span>
-                <span className="bg-white/20 px-3 py-1 rounded-full">Live Booking</span>
-                <span className="bg-white/20 px-3 py-1 rounded-full">Hindi default</span>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold anim-fade anim-delay-3">
+                <span className="bg-white/20 px-3 py-1 rounded-full">{t('landing.stats1')}</span>
+                <span className="bg-white/20 px-3 py-1 rounded-full">{t('landing.stats2')}</span>
+                <span className="bg-white/20 px-3 py-1 rounded-full">{t('landing.stats3')}</span>
               </div>
             </div>
-            <div className="hidden sm:flex items-center justify-center w-24 h-24 rounded-2xl bg-white/15 border border-white/20">
-              <Truck className="w-12 h-12 text-white" aria-hidden />
-            </div>
+            <img
+              src="/images/logo.png"
+              alt="Sarthi Setu"
+              className="hidden sm:block w-40 h-40 shrink-0 rounded-2xl object-contain bg-white/10 p-2 border-2 border-white/20 shadow-lg anim-scale anim-delay-2"
+            />
           </div>
         </section>
 
-        {/* VISUALS */}
-        <section>
-          <h2 className="text-lg font-extrabold text-gray-900 mb-3">India-ready, farmer-first</h2>
-          <AgriImages />
-        </section>
+        {/* MANDI PRICE TICKER */}
+        <MandiPriceTicker />
 
-        {/* ADVANTAGE */}
-        <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-4">The Saarthi Advantage</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-gray-100 p-4">
-              <p className="font-bold text-gray-900 flex items-center gap-2"><BadgeCheck className="w-5 h-5 text-green-600" /> Easy booking</p>
-              <p className="text-sm text-gray-600 mt-1">One-tap flow. Voice help anytime.</p>
-            </div>
-            <div className="rounded-2xl border border-gray-100 p-4">
-              <p className="font-bold text-gray-900 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-indigo-600" /> Price clarity</p>
-              <p className="text-sm text-gray-600 mt-1">Mandi + buyer signals (mock now, backend-ready).</p>
-            </div>
-            <div className="rounded-2xl border border-gray-100 p-4">
-              <p className="font-bold text-gray-900 flex items-center gap-2"><MapPin className="w-5 h-5 text-orange-600" /> Local matching</p>
-              <p className="text-sm text-gray-600 mt-1">Nearby jobs, nearby crops (mock geo for now).</p>
-            </div>
-            <div className="rounded-2xl border border-gray-100 p-4">
-              <p className="font-bold text-gray-900 flex items-center gap-2"><Radar className="w-5 h-5 text-purple-600" /> Live updates structure</p>
-              <p className="text-sm text-gray-600 mt-1">Prepared to plug realtime later.</p>
-            </div>
-          </div>
-        </section>
+        <div className="p-4 space-y-10">
+          {/* VISUALS */}
+          <section className="anim-fade-up anim-delay-1">
+            <AgriImages />
+          </section>
 
-        {/* HOW IT WORKS */}
-        <section className="bg-gradient-to-br from-amber-50 to-white rounded-3xl border border-amber-100 p-5">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-3">How it works</h2>
-          <ol className="space-y-3">
-            <li className="bg-white rounded-2xl border border-amber-100 p-4">
-              <p className="font-bold text-gray-900">1) Farmer adds crop</p>
-              <p className="text-sm text-gray-600 mt-1">Create a request with crop + quantity.</p>
-            </li>
-            <li className="bg-white rounded-2xl border border-amber-100 p-4">
-              <p className="font-bold text-gray-900">2) Transporter accepts</p>
-              <p className="text-sm text-gray-600 mt-1">Jobs appear instantly. Accept and move.</p>
-            </li>
-            <li className="bg-white rounded-2xl border border-amber-100 p-4">
-              <p className="font-bold text-gray-900">3) Buyer orders</p>
-              <p className="text-sm text-gray-600 mt-1">Browse produce and place orders.</p>
-            </li>
-          </ol>
-        </section>
+          {/* ADVANTAGE */}
+          <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 anim-fade-up anim-delay-2">
+            <h2 className="text-xl font-extrabold text-gray-900 mb-4">{t('landing.advantage')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {advantages.map(({ icon: Icon, titleKey, descKey, iconColor }, i) => (
+                <div
+                  key={titleKey}
+                  className={`rounded-2xl border border-gray-100 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 anim-scale anim-delay-${i + 1}`}
+                >
+                  <p className="font-bold text-gray-900 flex items-center gap-2">
+                    <Icon className={`w-5 h-5 ${iconColor}`} /> {t(titleKey)}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">{t(descKey)}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
-        {/* JOIN */}
-        <section ref={joinRef} className="scroll-mt-24">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-2 text-center">Join Saarthi</h2>
-          <p className="text-sm text-gray-600 text-center mb-4">What do you want to do?</p>
-          {(showJoin || true) && (
+          {/* LIVE MAP */}
+          <LiveMapSection />
+
+          {/* HOW IT WORKS */}
+          <section className="bg-gradient-to-br from-amber-50 to-white rounded-3xl border border-amber-100 p-5 anim-fade-up anim-delay-3">
+            <h2 className="text-xl font-extrabold text-gray-900 mb-3">{t('landing.howItWorks')}</h2>
+            <ol className="space-y-3">
+              {steps.map(({ titleKey, descKey }, i) => (
+                <li
+                  key={titleKey}
+                  className={`bg-white rounded-2xl border border-amber-100 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 anim-fade-up anim-delay-${i + 1}`}
+                >
+                  <p className="font-bold text-gray-900">{t(titleKey)}</p>
+                  <p className="text-sm text-gray-600 mt-1">{t(descKey)}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          {/* JOIN / ROLE SELECTION */}
+          <section ref={joinRef} className="scroll-mt-24 anim-fade-up anim-delay-4">
+            <h2 className="text-xl font-extrabold text-gray-900 mb-2 text-center">{t('landing.joinTitle')}</h2>
+            <p className="text-sm text-gray-600 text-center mb-4">{t('landing.joinSubtitle')}</p>
             <div className="space-y-3 max-w-lg mx-auto">
-              {roles.map(({ role, icon: Icon, titleKey, descKey, color }) => (
+              {roles.map(({ role, icon: Icon, titleKey, descKey, color }, i) => (
                 <button
                   key={role}
                   type="button"
@@ -126,7 +140,7 @@ export const LandingPage: React.FC = () => {
                     setUserRoleFromEnum(role);
                     setCurrentScreen('dashboard');
                   }}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 bg-white text-left shadow-sm active:scale-[0.99] transition-transform min-h-[60px] ${color}`}
+                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 bg-white text-left shadow-sm hover:shadow-lg hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 min-h-[60px] anim-scale anim-delay-${i + 1} ${color}`}
                 >
                   <div className="p-3 rounded-xl bg-white/80 border border-current/20">
                     <Icon className="w-7 h-7" aria-hidden />
@@ -135,18 +149,44 @@ export const LandingPage: React.FC = () => {
                     <p className="font-bold text-lg text-gray-900">{t(titleKey)}</p>
                     <p className="text-sm text-gray-600 mt-0.5">{t(descKey)}</p>
                   </div>
-                  <span className="font-extrabold text-green-700">→</span>
+                  <span className="font-extrabold text-green-700 text-xl">→</span>
                 </button>
               ))}
             </div>
-          )}
-        </section>
+          </section>
 
-        {/* CONTACT */}
-        <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5">
-          <h2 className="text-xl font-extrabold text-gray-900">Need Help?</h2>
-          <p className="text-sm text-gray-600 mt-2">Tap WhatsApp or Saathi Didi. We’ll guide you.</p>
-        </section>
+          {/* HELP */}
+          <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 anim-fade-up anim-delay-5">
+            <h2 className="text-xl font-extrabold text-gray-900">{t('landing.helpTitle')}</h2>
+            <p className="text-sm text-gray-600 mt-2">{t('landing.helpBody')}</p>
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <a
+                href={`tel:+${CONTACT.phoneE164}`}
+                className="flex items-center gap-2 min-h-[48px] px-4 rounded-xl bg-green-50 border border-green-200 text-green-800 font-bold text-sm hover:bg-green-100 transition-colors duration-200"
+              >
+                <Phone className="w-4 h-4" /> {CONTACT.phone}
+              </a>
+              <a
+                href={`mailto:${CONTACT.email}`}
+                className="flex items-center gap-2 min-h-[48px] px-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 font-bold text-sm hover:bg-blue-100 transition-colors duration-200"
+              >
+                <Mail className="w-4 h-4" /> {CONTACT.email}
+              </a>
+            </div>
+          </section>
+        </div>
+
+        {/* FOOTER */}
+        <footer className="mt-6 border-t border-gray-200 py-6 px-4 text-center anim-fade">
+          <img src="/images/logo.png" alt="Sarthi Setu" className="w-10 h-10 rounded mx-auto" />
+          <p className="mt-2 text-sm font-bold text-gray-700">Sarthi Setu — सारथी सेतु</p>
+          <p className="mt-1 text-xs text-gray-500">{t('landing.footer.builtFor')}</p>
+          <div className="mt-2 flex items-center justify-center gap-4 text-xs text-gray-500">
+            <a href={`tel:+${CONTACT.phoneE164}`} className="hover:text-green-700 transition-colors">{CONTACT.phone}</a>
+            <span>·</span>
+            <a href={`mailto:${CONTACT.email}`} className="hover:text-blue-700 transition-colors">{CONTACT.email}</a>
+          </div>
+        </footer>
       </div>
       <SaathiDidi />
       <WhatsAppFloat />

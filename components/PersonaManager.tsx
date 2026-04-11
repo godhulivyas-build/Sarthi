@@ -58,7 +58,7 @@ export const PersonaManager: React.FC<PersonaManagerProps> = ({ isOpen, onClose,
                                 <Icon size={20} />
                             </div>
                             <span className="font-semibold">{role}</span>
-                            {isActive && <div className="ml-auto text-xs font-bold bg-green-200 text-green-800 px-2 py-1 rounded-full">{lang === 'hi' ? 'चालू' : 'ON'}</div>}
+                            {isActive && <div className="ml-auto text-xs font-bold bg-green-200 text-green-800 px-2 py-1 rounded-full">✓</div>}
                         </button>
                         );
                 })}

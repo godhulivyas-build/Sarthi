@@ -14,7 +14,7 @@ export enum AppScreen {
 
 export type SaarthiScreen = 'landing' | 'dashboard';
 
-export type FarmerDashboardView = 'home' | 'book_vehicle' | 'my_requests';
+export type FarmerDashboardView = 'home' | 'book_vehicle' | 'my_requests' | 'weather' | 'prices' | 'alerts';
 export type TransporterDashboardView = 'home' | 'jobs' | 'my_trips';
 export type BuyerDashboardView = 'home' | 'browse' | 'orders';
 

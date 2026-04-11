@@ -1,16 +1,9 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
+import { CONTACT } from '../config/contact';
 
-type WhatsAppFloatProps = {
-  phoneE164?: string;
-  message?: string;
-};
-
-export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({
-  phoneE164 = '919876543210',
-  message = 'Namaste! Saarthi par madad chahiye.',
-}) => {
-  const href = `https://wa.me/${phoneE164}?text=${encodeURIComponent(message)}`;
+export const WhatsAppFloat: React.FC = () => {
+  const href = `https://wa.me/${CONTACT.phoneE164}?text=${encodeURIComponent(CONTACT.whatsappPrefill)}`;
   return (
     <a
       href={href}
@@ -24,4 +17,3 @@ export const WhatsAppFloat: React.FC<WhatsAppFloatProps> = ({
     </a>
   );
 };
-

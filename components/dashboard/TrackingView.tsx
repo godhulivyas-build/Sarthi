@@ -23,9 +23,9 @@ export const TrackingView: React.FC<TrackingViewProps> = ({ activeShipments }) =
         if(trackId.length > 3) {
              setResult({
                 id: trackId.startsWith('SA-') ? trackId : `SA-${trackId}`,
-                source: 'Nagpur',
-                destination: 'Delhi',
-                crop: 'Oranges',
+                source: 'Indore',
+                destination: 'Bhopal',
+                crop: 'Soybean',
                 weight: '10 Tons',
                 status: 'In Transit',
                 date: '2023-10-25',

@@ -7,13 +7,20 @@ type ScreenChromeProps = {
   title?: string;
 };
 
+const langOptions = [
+  { code: 'hi' as const, label: 'हिं' },
+  { code: 'kn' as const, label: 'ಕನ್' },
+  { code: 'te' as const, label: 'తె' },
+  { code: 'en' as const, label: 'EN' },
+];
+
 export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, title }) => {
   const { lang, setLang, t } = useI18n();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50/80 to-white flex flex-col">
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200 px-2 py-3 flex items-center gap-2 shadow-sm safe-top">
-        <div className="w-[4.5rem] shrink-0 flex justify-start">
+        <div className="shrink-0 flex items-center gap-1">
           {onBack ? (
             <button
               type="button"
@@ -24,7 +31,13 @@ export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, ti
               ←
             </button>
           ) : (
-            <span className="min-w-[44px]" aria-hidden />
+            <div className="flex items-center gap-1.5 pl-1">
+              <img src="/images/logo.png" alt="Sarthi Setu" className="w-7 h-7 rounded" />
+              <span className="font-extrabold text-green-800 text-sm leading-none">
+                Sarthi Setu<br />
+                <span className="text-[10px] font-bold text-gray-500">सारथी सेतु</span>
+              </span>
+            </div>
           )}
         </div>
         {title ? (
@@ -32,35 +45,17 @@ export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, ti
         ) : (
           <div className="flex-1" />
         )}
-        <div className="flex items-center gap-1 shrink-0 w-[5.5rem] sm:w-auto justify-end">
-          <button
-            type="button"
-            onClick={() => setLang('hi')}
-            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'hi' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
-          >
-            हिं
-          </button>
-          <button
-            type="button"
-            onClick={() => setLang('kn')}
-            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'kn' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
-          >
-            ಕನ್
-          </button>
-          <button
-            type="button"
-            onClick={() => setLang('te')}
-            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'te' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
-          >
-            తె
-          </button>
-          <button
-            type="button"
-            onClick={() => setLang('en')}
-            className={`min-h-[40px] px-2.5 py-1.5 rounded-lg text-xs font-bold border ${lang === 'en' ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
-          >
-            EN
-          </button>
+        <div className="flex items-center gap-1 shrink-0 justify-end">
+          {langOptions.map(({ code, label }) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => setLang(code)}
+              className={`min-h-[36px] px-2 py-1 rounded-lg text-xs font-bold border ${lang === code ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </header>
       <div className="flex-1">{children}</div>

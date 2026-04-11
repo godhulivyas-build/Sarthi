@@ -14,7 +14,7 @@ export const MarketRatesView: React.FC<MarketRatesViewProps> = ({ preferences })
   useEffect(() => {
     const fetchRates = async () => {
       setLoading(true);
-      const data = await getMarketRates(preferences?.location || 'Nashik', preferences?.primaryCrop || 'Onion');
+      const data = await getMarketRates(preferences?.location || 'Indore', preferences?.primaryCrop || 'Soybean');
       setRates(data);
       setLoading(false);
     };

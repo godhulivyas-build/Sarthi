@@ -3,9 +3,9 @@ import { useI18n } from '../../i18n/I18nContext';
 import { Users, MapPin } from 'lucide-react';
 
 const fpos = [
-  { id: '1', nameHi: 'नासिक सहकारी FPO', nameEn: 'Nashik Cooperative FPO', km: 14 },
-  { id: '2', nameHi: 'गंगापुर किसान समूह', nameEn: 'Gangapur Farmer Group', km: 28 },
-  { id: '3', nameHi: 'जिला महिला FPO', nameEn: 'District Women FPO', km: 35 },
+  { id: '1', nameHi: 'इंदौर सहकारी FPO', nameEn: 'Indore Cooperative FPO', km: 14 },
+  { id: '2', nameHi: 'उज्जैन किसान समूह', nameEn: 'Ujjain Farmer Group', km: 28 },
+  { id: '3', nameHi: 'देवास महिला FPO', nameEn: 'Dewas Women FPO', km: 35 },
 ];
 
 export const FPONearbyView: React.FC = () => {

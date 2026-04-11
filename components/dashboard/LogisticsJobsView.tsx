@@ -22,8 +22,7 @@ export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({ preference
   const [busy, setBusy] = useState<string | null>(null);
 
   const name =
-    preferences?.location?.trim() ||
-    (lang === 'hi' ? 'ड्राइवर' : 'Driver');
+    preferences?.location?.trim() || t('dashboard.driver');
 
   const load = useCallback(async () => {
     setLoading(true);

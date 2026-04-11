@@ -9,14 +9,17 @@ interface CropDiscoveryViewProps {
   preferences: UserPreferences | null;
 }
 
+const CROP_OPTIONS = ['Soybean', 'Wheat', 'Onion', 'Gram', 'Garlic', 'Tomato'];
+
+const QTY_PRESETS = [1, 5, 10, 25];
+
 export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preferences }) => {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [items, setItems] = useState<ProduceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [locFilter, setLocFilter] = useState(preferences?.location || '');
   const [cropFilter, setCropFilter] = useState('');
   const [orderFor, setOrderFor] = useState<ProduceItem | null>(null);
-  const [qty, setQty] = useState('1');
+  const [qty, setQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
   const load = async () => {
@@ -30,33 +33,28 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
     load();
   }, []);
 
-  useEffect(() => {
-    if (preferences?.location) setLocFilter(preferences.location);
-  }, [preferences?.location]);
-
   const filtered = items.filter((p) => {
-    const locOk = !locFilter.trim() || p.farmerLocation.toLowerCase().includes(locFilter.trim().toLowerCase());
-    const cropOk = !cropFilter.trim() || p.crop.toLowerCase().includes(cropFilter.trim().toLowerCase());
-    return locOk && cropOk;
+    if (!cropFilter) return true;
+    return p.crop.toLowerCase() === cropFilter.toLowerCase();
   });
 
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderFor) return;
-    const q = Number(qty);
-    if (!Number.isFinite(q) || q <= 0 || q > orderFor.quantity) return;
+    if (!orderFor || qty <= 0 || qty > orderFor.quantity) return;
     setSubmitting(true);
     await placeOrder({
       produceId: orderFor.id,
-      buyerName: preferences?.location?.trim() || (lang === 'hi' ? 'खरीदार' : 'Buyer'),
+      buyerName: preferences?.location?.trim() || t('dashboard.buyer'),
       buyerLocation: preferences?.location?.trim() || '—',
-      quantity: q,
+      quantity: qty,
     });
     setSubmitting(false);
     setOrderFor(null);
-    setQty('1');
+    setQty(1);
     await load();
   };
+
+  const uniqueLocations = [...new Set(items.map((i) => i.farmerLocation))];
 
   return (
     <div className="p-4 space-y-4 pb-28">
@@ -65,25 +63,19 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
         {t('action.browseProduce')}
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterLocation')}</label>
-          <input
-            value={locFilter}
-            onChange={(e) => setLocFilter(e.target.value)}
-            className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base"
-            placeholder={t('onboard.locationPh')}
-          />
-        </div>
-        <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterCrop')}</label>
-          <input
-            value={cropFilter}
-            onChange={(e) => setCropFilter(e.target.value)}
-            className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base"
-            placeholder="Onion / Tomato"
-          />
-        </div>
+      {/* Filter by crop — dropdown */}
+      <div>
+        <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterCrop')}</label>
+        <select
+          value={cropFilter}
+          onChange={(e) => setCropFilter(e.target.value)}
+          className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base bg-white"
+        >
+          <option value="">{t('buyer.filterCrop')}…</option>
+          {CROP_OPTIONS.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       {loading ? (
@@ -109,15 +101,15 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
                       <IndianRupee className="w-5 h-5 text-gray-400" />
                       {item.pricePerUnit}
                     </p>
-                    <p className="text-[10px] text-gray-500">per {item.unit}</p>
+                    <p className="text-[10px] text-gray-500">/{item.unit}</p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-700 mt-2">
-                  {lang === 'hi' ? 'उपलब्ध' : 'Available'}: {item.quantity} {item.unit}
+                  {item.quantity} {item.unit}
                 </p>
                 <button
                   type="button"
-                  onClick={() => setOrderFor(item)}
+                  onClick={() => { setOrderFor(item); setQty(1); }}
                   className="mt-3 w-full min-h-[48px] rounded-xl bg-purple-600 text-white font-bold text-base"
                 >
                   {t('buyer.order')}
@@ -128,6 +120,7 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
         </div>
       )}
 
+      {/* Order modal — quantity preset buttons */}
       {orderFor && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
           <form
@@ -136,15 +129,21 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
           >
             <p className="font-bold text-lg">{orderFor.crop}</p>
             <label className="block text-sm font-medium text-gray-700">{t('produce.qty')}</label>
-            <input
-              type="number"
-              min={1}
-              max={orderFor.quantity}
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-              className="w-full min-h-[48px] border rounded-xl px-3 text-lg"
-              required
-            />
+            <div className="flex flex-wrap gap-2">
+              {QTY_PRESETS.filter((q) => q <= orderFor.quantity).map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => setQty(q)}
+                  className={`min-h-[44px] min-w-[56px] rounded-xl border-2 font-bold text-base ${
+                    qty === q ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-200'
+                  }`}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500">{orderFor.unit} (max {orderFor.quantity})</p>
             <div className="flex gap-2">
               <Button type="button" fullWidth variant="outline" onClick={() => setOrderFor(null)}>
                 {t('back')}
