@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppState } from '../state/AppState';
 import { useI18n } from '../i18n/I18nContext';
-import { VoiceMic } from './VoiceMic';
 import { SaathiDidi } from './SaathiDidi';
 import { CropDiscoveryView } from './dashboard/CropDiscoveryView';
 import { BuyerOrdersView } from './dashboard/BuyerOrdersView';
@@ -222,7 +221,6 @@ export const Dashboard: React.FC = () => {
       </nav>
 
       <SaathiDidi />
-      <VoiceMic />
     </div>
   );
 };

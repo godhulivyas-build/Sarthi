@@ -125,6 +125,8 @@ export const translationKeys = [
   'dashboard.alerts',
   'dashboard.liveMap',
   'dashboard.viewAll',
+  'saathiDidi.name',
+  'saathiDidi.prompt',
 ] as const;
 
 export type TranslationKey = (typeof translationKeys)[number];
@@ -216,7 +218,7 @@ export const translations: Record<Lang, Row> = {
     'buyer.filterCrop': 'फसल',
     'buyer.order': 'ऑर्डर',
     'landing.startNow': 'शुरू करें',
-    'landing.heroTitle': 'Farm se Market tak — Seedha aur Sasta',
+    'landing.heroTitle': 'फार्म से मार्केट तक — सीधा और सस्ता',
     'landing.stats1': '50,000+ किसान',
     'landing.stats2': 'लाइव बुकिंग',
     'landing.stats3': 'हिंदी डिफ़ॉल्ट',
@@ -258,6 +260,8 @@ export const translations: Record<Lang, Row> = {
     'dashboard.alerts': 'सूचनाएं',
     'dashboard.liveMap': 'लाइव नक्शा',
     'dashboard.viewAll': 'सब देखें →',
+    'saathiDidi.name': 'साथी दीदी',
+    'saathiDidi.prompt': 'अगर समझ नहीं आ रहा, तो मुझे दबाइए। मैं मदद करती हूँ।',
   },
   en: {
     'lang.hi': 'Hindi',
@@ -385,6 +389,8 @@ export const translations: Record<Lang, Row> = {
     'dashboard.alerts': 'Alerts',
     'dashboard.liveMap': 'Live Map',
     'dashboard.viewAll': 'View all →',
+    'saathiDidi.name': 'Saathi Didi',
+    'saathiDidi.prompt': 'Tap me. I will explain and listen.',
   },
   kn: {
     'lang.hi': 'ಹಿಂದಿ',
@@ -511,6 +517,8 @@ export const translations: Record<Lang, Row> = {
     'dashboard.alerts': 'ಅಲರ್ಟ್',
     'dashboard.liveMap': 'ಲೈವ್ ನಕ್ಷೆ',
     'dashboard.viewAll': 'ಎಲ್ಲಾ ನೋಡಿ →',
+    'saathiDidi.name': 'ಸಾಥಿ ದೀದಿ',
+    'saathiDidi.prompt': 'ಅರ್ಥವಾಗದಿದ್ದರೆ, ನನ್ನನ್ನು ಒತ್ತಿ. ನಾನು ಸಹಾಯ ಮಾಡುತ್ತೇನೆ.',
   },
   te: {
     'lang.hi': 'హిందీ',
@@ -637,5 +645,7 @@ export const translations: Record<Lang, Row> = {
     'dashboard.alerts': 'అలర్ట్‌లు',
     'dashboard.liveMap': 'లైవ్ మ్యాప్',
     'dashboard.viewAll': 'అన్నీ చూడండి →',
+    'saathiDidi.name': 'సాథి దీదీ',
+    'saathiDidi.prompt': 'అర్థం కాకపోతే, నన్ను నొక్కండి. నేను సహాయం చేస్తాను.',
   },
 };
