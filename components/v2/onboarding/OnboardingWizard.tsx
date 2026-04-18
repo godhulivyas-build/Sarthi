@@ -6,10 +6,10 @@ import { useAppState } from '../../../state/AppState';
 import type { Lang } from '../../../i18n/translations';
 import type { SaarthiUserRole } from '../../../types';
 import { requestOtp, verifyOtp } from '../../../services/auth/mockOtp';
-import { Button } from '../../ui/Button';
 import { MapPin } from 'lucide-react';
 import { SinglePinLocationMap } from '../maps/SinglePinLocationMap';
 import { MP_CENTER } from '../../../config/mpLocations';
+import { Card, TextField, V2Button, StepIndicator } from '../ui';
 
 const LANGS: Lang[] = ['hi', 'en', 'kn', 'te'];
 
@@ -21,8 +21,10 @@ const PersonaCard: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`w-full min-h-[56px] rounded-2xl border-2 px-4 text-left font-bold transition-all ${
-      active ? 'border-[var(--saarthi-primary)] bg-white shadow-md' : 'border-transparent bg-[var(--saarthi-surface-low)]'
+    className={`w-full min-h-[56px] rounded-2xl px-4 text-left font-bold transition-all border ${
+      active
+        ? 'border-[var(--saarthi-primary)] bg-white shadow-md text-[var(--saarthi-primary)]'
+        : 'border-[var(--saarthi-outline-soft)] bg-[var(--saarthi-surface-low)] text-[var(--saarthi-on-background)]'
     }`}
   >
     {label}
@@ -110,165 +112,150 @@ export const OnboardingWizard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--saarthi-bg)] text-[var(--saarthi-on-surface)] px-4 py-8 pb-24 max-w-lg mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <button type="button" className="text-sm font-bold text-[var(--saarthi-primary)]" onClick={() => navigate('/')}>
-          {tV2('v2.common.back')}
-        </button>
-        <span className="text-xs font-bold text-[var(--saarthi-on-surface-variant)]">
-          {tV2('v2.onboard.step')} {step}/7
-        </span>
-      </div>
-
-      <h1 className="saarthi-headline text-2xl font-extrabold text-[var(--saarthi-primary)] mb-1">{tV2('v2.header.app')}</h1>
-      {err ? <p className="text-red-600 text-sm mb-2">{err}</p> : null}
-
-      {step === 1 && (
-        <div className="space-y-4 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.phoneTitle')}</h2>
-          <p className="text-sm text-gray-600">{tV2('v2.onboard.phoneHint')}</p>
-          <input
-            className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 px-4 text-lg bg-white"
-            inputMode="numeric"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="9876543210"
-          />
-          <Button type="button" fullWidth className="min-h-[56px] rounded-2xl" onClick={onRequestOtp} disabled={busy}>
-            {tV2('v2.onboard.continue')}
-          </Button>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="space-y-4 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.otpTitle')}</h2>
-          <p className="text-sm text-gray-600">{tV2('v2.onboard.otpHint')}</p>
-          <input
-            className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 px-4 text-lg bg-white tracking-widest"
-            inputMode="numeric"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            maxLength={6}
-          />
-          <Button type="button" fullWidth onClick={onVerifyOtp} disabled={busy}>
-            {tV2('v2.onboard.verify')}
-          </Button>
-          <button type="button" className="text-sm font-bold text-[var(--saarthi-tertiary)] w-full" onClick={onRequestOtp}>
-            {tV2('v2.onboard.resendOtp')}
+    <div className="px-4 py-6 pb-28 max-w-lg mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <button type="button" className="text-sm font-bold text-[var(--saarthi-primary)] px-2 py-1 rounded-xl hover:bg-white/60" onClick={() => navigate('/')}>
+            {tV2('v2.common.back')}
           </button>
+          <span className="text-xs font-bold text-[var(--saarthi-on-surface-variant)]">
+            {tV2('v2.onboard.step')} {step}/7
+          </span>
         </div>
-      )}
 
-      {step === 3 && (
-        <div className="space-y-4 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.nameTitle')}</h2>
-          <input
-            className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 px-4 text-lg bg-white"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Button type="button" fullWidth onClick={() => name.trim() && setStep(4)} disabled={!name.trim()}>
-            {tV2('v2.common.next')}
-          </Button>
-        </div>
-      )}
+        <StepIndicator total={7} current={step} className="mb-6" />
 
-      {step === 4 && (
-        <div className="space-y-3 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.langTitle')}</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {LANGS.map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => setPickLang(l)}
-                className={`min-h-[52px] rounded-2xl font-bold border-2 ${
-                  pickLang === l ? 'bg-[var(--saarthi-primary)] text-white border-[var(--saarthi-primary)]' : 'bg-white border-gray-200'
-                }`}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
-          </div>
-          <Button type="button" fullWidth onClick={() => setStep(5)}>
-            {tV2('v2.common.next')}
-          </Button>
-        </div>
-      )}
+        <h1 className="saarthi-headline text-2xl sm:text-3xl font-extrabold text-[var(--saarthi-primary)] mb-1">{tV2('v2.header.app')}</h1>
+        <p className="text-sm text-[var(--saarthi-on-surface-variant)] mb-4">{tV2('v2.onboard.welcomeLine')}</p>
+        {err ? <p className="text-red-600 text-sm mb-3">{err}</p> : null}
 
-      {step === 5 && (
-        <div className="space-y-3 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.personaTitle')}</h2>
-          <div className="space-y-2">
-            <PersonaCard label={tV2('v2.persona.farmer')} active={persona === 'farmer'} onClick={() => setPersona('farmer')} />
-            <PersonaCard label={tV2('v2.persona.buyer')} active={persona === 'buyer'} onClick={() => setPersona('buyer')} />
-            <PersonaCard
-              label={tV2('v2.persona.logistics')}
-              active={persona === 'logistics_partner'}
-              onClick={() => setPersona('logistics_partner')}
+        {step === 1 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline text-[var(--saarthi-on-background)]">{tV2('v2.onboard.phoneTitle')}</h2>
+            <p className="text-sm text-[var(--saarthi-on-surface-variant)]">{tV2('v2.onboard.phoneHint')}</p>
+            <TextField
+              id="phone"
+              inputMode="numeric"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="9876543210"
             />
-            <PersonaCard
-              label={tV2('v2.persona.cold')}
-              active={persona === 'cold_storage_owner'}
-              onClick={() => setPersona('cold_storage_owner')}
-            />
-          </div>
-          <Button type="button" fullWidth disabled={!persona} onClick={() => setStep(6)}>
-            {tV2('v2.common.next')}
-          </Button>
-        </div>
-      )}
+            <V2Button type="button" fullWidth variant="primary" onClick={onRequestOtp} disabled={busy}>
+              {tV2('v2.onboard.continue')}
+            </V2Button>
+          </Card>
+        )}
 
-      {step === 6 && (
-        <div className="space-y-4 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.locationTitle')}</h2>
-          <p className="text-sm text-gray-600">{tV2('v2.onboard.locationHint')}</p>
-          <p className="text-xs text-gray-500">{tV2('v2.onboard.mapHint')}</p>
-          <SinglePinLocationMap
-            lat={session.lat}
-            lng={session.lng}
-            defaultCenter={MP_CENTER}
-            onChange={(lat, lng) => {
-              updateSession({ lat, lng });
-            }}
-          />
-          <div className="relative">
-            <MapPin className="absolute left-3 top-3.5 text-gray-400" size={20} />
-            <input
-              className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 pl-11 pr-4 text-lg bg-white"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder={tV2('v2.onboard.locationHint')}
-            />
-          </div>
-          <Button type="button" variant="outline" fullWidth onClick={useGps}>
-            {tV2('v2.onboard.useGps')}
-          </Button>
-          <Button type="button" fullWidth onClick={() => setStep(7)} disabled={!address.trim()}>
-            {tV2('v2.common.next')}
-          </Button>
-        </div>
-      )}
+        {step === 2 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.otpTitle')}</h2>
+            <p className="text-sm text-[var(--saarthi-on-surface-variant)]">{tV2('v2.onboard.otpHint')}</p>
+            <TextField id="otp" inputMode="numeric" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6} />
+            <V2Button type="button" fullWidth variant="primary" onClick={onVerifyOtp} disabled={busy}>
+              {tV2('v2.onboard.verify')}
+            </V2Button>
+            <button type="button" className="text-sm font-bold text-[var(--saarthi-tertiary)] w-full py-2" onClick={onRequestOtp}>
+              {tV2('v2.onboard.resendOtp')}
+            </button>
+          </Card>
+        )}
 
-      {step === 7 && (
-        <div className="space-y-4 mt-6">
-          <h2 className="text-lg font-bold">{tV2('v2.onboard.summaryTitle')}</h2>
-          <div className="rounded-2xl bg-white p-4 space-y-2 text-sm shadow-sm">
-            <p>
-              <span className="font-bold">{name}</span> · {phone}
-            </p>
-            <p>{address}</p>
-            <p className="text-xs text-gray-500">{pickLang.toUpperCase()}</p>
-          </div>
-          <Button type="button" fullWidth className="min-h-[56px] rounded-2xl" onClick={finish}>
-            {tV2('v2.onboard.continue')}
-          </Button>
-          <button type="button" className="text-xs text-gray-500 w-full text-center" onClick={() => clearSession()}>
-            Reset
-          </button>
-        </div>
-      )}
+        {step === 3 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.nameTitle')}</h2>
+            <TextField id="name" value={name} onChange={(e) => setName(e.target.value)} />
+            <V2Button type="button" fullWidth variant="primary" onClick={() => name.trim() && setStep(4)} disabled={!name.trim()}>
+              {tV2('v2.common.next')}
+            </V2Button>
+          </Card>
+        )}
+
+        {step === 4 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.langTitle')}</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {LANGS.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => setPickLang(l)}
+                  className={`min-h-[52px] rounded-2xl font-bold border-2 transition-colors ${
+                    pickLang === l ? 'bg-[var(--saarthi-primary)] text-white border-[var(--saarthi-primary)]' : 'bg-white border-[var(--saarthi-outline-soft)] text-[var(--saarthi-on-background)]'
+                  }`}
+                >
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <V2Button type="button" fullWidth variant="primary" onClick={() => setStep(5)}>
+              {tV2('v2.common.next')}
+            </V2Button>
+          </Card>
+        )}
+
+        {step === 5 && (
+          <Card className="space-y-3 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.personaTitle')}</h2>
+            <div className="space-y-2">
+              <PersonaCard label={tV2('v2.persona.farmer')} active={persona === 'farmer'} onClick={() => setPersona('farmer')} />
+              <PersonaCard label={tV2('v2.persona.buyer')} active={persona === 'buyer'} onClick={() => setPersona('buyer')} />
+              <PersonaCard label={tV2('v2.persona.logistics')} active={persona === 'logistics_partner'} onClick={() => setPersona('logistics_partner')} />
+              <PersonaCard label={tV2('v2.persona.cold')} active={persona === 'cold_storage_owner'} onClick={() => setPersona('cold_storage_owner')} />
+            </div>
+            <V2Button type="button" fullWidth variant="primary" disabled={!persona} onClick={() => setStep(6)}>
+              {tV2('v2.common.next')}
+            </V2Button>
+          </Card>
+        )}
+
+        {step === 6 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.locationTitle')}</h2>
+            <p className="text-sm text-[var(--saarthi-on-surface-variant)]">{tV2('v2.onboard.locationHint')}</p>
+            <p className="text-xs text-[var(--saarthi-on-surface-variant)]">{tV2('v2.onboard.mapHint')}</p>
+            <SinglePinLocationMap
+              lat={session.lat}
+              lng={session.lng}
+              defaultCenter={MP_CENTER}
+              onChange={(lat, lng) => {
+                updateSession({ lat, lng });
+              }}
+            />
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3.5 text-gray-400 pointer-events-none z-10" size={20} />
+              <input
+                className="saarthi-input pl-11"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder={tV2('v2.onboard.locationHint')}
+              />
+            </div>
+            <V2Button type="button" fullWidth variant="outline" onClick={useGps}>
+              {tV2('v2.onboard.useGps')}
+            </V2Button>
+            <V2Button type="button" fullWidth variant="primary" onClick={() => setStep(7)} disabled={!address.trim()}>
+              {tV2('v2.common.next')}
+            </V2Button>
+          </Card>
+        )}
+
+        {step === 7 && (
+          <Card className="space-y-4 mt-2">
+            <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.summaryTitle')}</h2>
+            <div className="rounded-2xl bg-[var(--saarthi-surface-low)] p-4 space-y-2 text-sm border border-[var(--saarthi-outline-soft)]">
+              <p>
+                <span className="font-bold">{name}</span> · {phone}
+              </p>
+              <p>{address}</p>
+              <p className="text-xs text-[var(--saarthi-on-surface-variant)]">{pickLang.toUpperCase()}</p>
+            </div>
+            <V2Button type="button" fullWidth variant="primary" onClick={finish}>
+              {tV2('v2.onboard.continue')}
+            </V2Button>
+            <button type="button" className="text-xs text-gray-500 w-full text-center py-2" onClick={() => clearSession()}>
+              Reset
+            </button>
+          </Card>
+        )}
     </div>
   );
 };

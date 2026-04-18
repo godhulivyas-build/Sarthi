@@ -4,6 +4,7 @@ import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { OnboardingWizard } from './components/v2/onboarding/OnboardingWizard';
 import { RequireSession } from './components/v2/layout/RequireSession';
+import { V2AppShell } from './components/v2/layout/V2AppShell';
 import { useAppState } from './state/AppState';
 
 const DashboardRouteSync: React.FC = () => {
@@ -16,7 +17,7 @@ const DashboardRouteSync: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen saarthi-v2">
+    <V2AppShell>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingWizard />} />
@@ -30,7 +31,7 @@ const App: React.FC = () => {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </div>
+    </V2AppShell>
   );
 };
 

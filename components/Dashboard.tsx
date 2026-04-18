@@ -15,6 +15,7 @@ import { WalletView } from './dashboard/WalletView';
 import { TrackingView } from './dashboard/TrackingView';
 import { LogisticsBookingMapFlow } from './v2/farmer/LogisticsBookingMapFlow';
 import { ColdStorageDashboard } from './v2/cold/ColdStorageDashboard';
+import { AppHeader } from './v2/ui/AppHeader';
 import type { Shipment, UserPreferences, WalletState } from '../types';
 import { loadPayments } from '../services/payments/mockPayment';
 import { listPickupRequests } from '../services/mvpDataService';
@@ -32,32 +33,6 @@ import {
   Warehouse,
   MapPin,
 } from 'lucide-react';
-
-const LangPills: React.FC = () => {
-  const { lang, setLang } = useI18n();
-  const opts = [
-    { code: 'hi' as const, label: 'हिं' },
-    { code: 'kn' as const, label: 'ಕನ್' },
-    { code: 'te' as const, label: 'తె' },
-    { code: 'en' as const, label: 'EN' },
-  ];
-  return (
-    <div className="flex flex-wrap gap-1">
-      {opts.map(({ code, label }) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => setLang(code)}
-          className={`min-h-[32px] px-2 rounded-lg text-[10px] font-bold border ${
-            lang === code ? 'bg-[var(--saarthi-primary)] text-white border-[var(--saarthi-primary)]' : 'bg-gray-100 text-gray-700 border-gray-200'
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-};
 
 const FarmerRequests: React.FC = () => {
   const { t } = useI18n();
@@ -232,19 +207,8 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--saarthi-bg)] pb-24 relative">
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[var(--saarthi-surface-high)] px-3 py-2 flex flex-wrap items-center justify-between gap-2 shadow-sm">
-        <div className="flex items-center gap-2 min-w-0">
-          <img src="/images/logo.png" alt="" className="w-7 h-7 rounded shrink-0" />
-          <span className="font-bold text-sm sm:text-base truncate saarthi-headline">{title}</span>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <LangPills />
-          <button type="button" onClick={onLogout} className="text-red-600 font-bold text-xs sm:text-sm px-1">
-            {t('profile.logout')}
-          </button>
-        </div>
-      </header>
+    <div className="pb-24 relative">
+      <AppHeader title={title} onLogout={onLogout} />
 
       <main className="max-w-3xl mx-auto">
         {role === 'farmer' && dv.view === 'home' && (

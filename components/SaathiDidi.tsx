@@ -50,8 +50,8 @@ export const SaathiDidi: React.FC = () => {
       <button
         type="button"
         onClick={toggle}
-        className={`w-full flex items-center gap-3 bg-white border-2 rounded-2xl p-3 shadow-lg active:scale-[0.99] ${
-          speaking || listening ? 'border-red-300' : 'border-green-200'
+        className={`w-full flex items-center gap-3 saarthi-glass-panel border-0 rounded-2xl p-3 shadow-lg active:scale-[0.99] ${
+          speaking || listening ? 'ring-2 ring-red-300' : 'ring-1 ring-green-200/60'
         }`}
         aria-label={t('saathiDidi.name')}
       >
