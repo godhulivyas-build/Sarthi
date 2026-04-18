@@ -1,83 +1,71 @@
 import type { Lang } from '../i18n/translations';
 import type {
   BuyerDashboardView,
+  ColdStorageDashboardView,
   FarmerDashboardView,
-  TransporterDashboardView,
+  LogisticsDashboardView,
 } from '../types';
 
 type VoiceRow = Partial<Record<Lang, string>>;
 
 export const landingVoice: VoiceRow = {
-  hi: 'Farm se Market tak – Seedha aur Sasta। अपनी भूमिका चुनिए: किसान, ट्रांसपोर्टर, या खरीदार।',
-  en: 'Farm to market — direct and affordable. Choose your role: farmer, transporter, or buyer.',
-  kn: 'Farm to market — direct. Role ಆಯ್ಕೆ ಮಾಡಿ: farmer, transporter, buyer.',
-  te: 'Farm to market — direct. మీ పాత్ర ఎంచుకోండి: farmer, transporter, buyer.',
+  hi: 'सारथी सेतु — किसान, खरीदार, लॉजिस्टिक्स और कोल्ड स्टोरेज एक साथ।',
+  en: 'Sarthi Setu — farmers, buyers, logistics and cold storage together.',
+  kn: 'Sarthi Setu — farmers, buyers, logistics.',
+  te: 'Sarthi Setu — farmers, buyers, logistics.',
 };
+
+const row = (hi: string, en: string): VoiceRow => ({ hi, en, kn: en, te: en });
+
+const mini = (hi: string, en: string): VoiceRow => row(hi, en);
 
 export const voiceContent: {
   farmer: Record<FarmerDashboardView, VoiceRow>;
-  transporter: Record<TransporterDashboardView, VoiceRow>;
+  logistics_partner: Record<LogisticsDashboardView, VoiceRow>;
   buyer: Record<BuyerDashboardView, VoiceRow>;
+  cold_storage_owner: Record<ColdStorageDashboardView, VoiceRow>;
 } = {
   farmer: {
-    home: {
-      hi: 'किसान होम। दो काम: गाड़ी बुक करें या मेरी रिक्वेस्ट देखें। बोलें: गाड़ी बुक करो।',
-      en: 'Farmer home. Two actions: book vehicle or view my requests.',
-      kn: 'Farmer home. Book vehicle ಅಥವಾ requests ನೋಡಿ.',
-      te: 'Farmer home. Book vehicle లేదా requests చూడండి.',
-    },
-    book_vehicle: {
-      hi: 'गाड़ी बुक स्क्रीन। फसल और मात्रा चुनकर पिकअप रिक्वेस्ट भेजें।',
-      en: 'Book vehicle screen. Choose crop and quantity, then submit request.',
-      kn: 'Book vehicle. Crop ಮತ್ತು quantity ಆಯ್ಕೆ ಮಾಡಿ.',
-      te: 'Book vehicle. Crop మరియు quantity ఎంచుకోండి.',
-    },
-    my_requests: {
-      hi: 'मेरी रिक्वेस्ट स्क्रीन। यहाँ आपकी सभी रिक्वेस्ट और स्टेटस दिखेगा।',
-      en: 'My requests. You can see request status here.',
-      kn: 'My requests. Status ನೋಡಿ.',
-      te: 'My requests. Status చూడండి.',
-    },
+    home: mini('किसान होम। मंडी भाव, मौसम, बुकिंग।', 'Farmer home. Mandi, weather, booking.'),
+    book_vehicle: mini('गाड़ी बुक — नक्शा पर पिकअप और ड्रॉप चुनें।', 'Book logistics — pick pickup and drop on the map.'),
+    my_requests: mini('आपकी रिक्वेस्ट।', 'Your requests.'),
+    weather: mini('मौसम।', 'Weather.'),
+    prices: mini('मंडी भाव।', 'Mandi prices.'),
+    alerts: mini('सूचनाएं।', 'Alerts.'),
+    nearby_buyers: mini('नज़दीकी खरीदार।', 'Nearby buyers.'),
+    cold_nearby: mini('नज़दीकी कोल्ड स्टोरेज।', 'Nearby cold storage.'),
+    wallet: mini('वॉलेट।', 'Wallet.'),
+    payments: mini('भुगतान।', 'Payments.'),
+    track: mini('ट्रैकिंग।', 'Shipment tracking.'),
   },
-  transporter: {
-    home: {
-      hi: 'ड्राइवर होम। काम देखने के लिए बोलें: काम दिखाओ।',
-      en: 'Driver home. Say: show jobs.',
-      kn: 'Driver home. Jobs ನೋಡಿ.',
-      te: 'Driver home. Jobs చూడండి.',
-    },
-    jobs: {
-      hi: 'काम स्क्रीन। कोई काम चुनें और स्वीकार करें।',
-      en: 'Jobs screen. Pick a job and accept.',
-      kn: 'Jobs. Job ಆಯ್ಕೆ ಮಾಡಿ accept ಮಾಡಿ.',
-      te: 'Jobs. Job ఎంచుకుని accept చేయండి.',
-    },
-    my_trips: {
-      hi: 'मेरी ट्रिप स्क्रीन। यहाँ आपके स्वीकार किए काम दिखेंगे।',
-      en: 'My trips. Your accepted jobs show here.',
-      kn: 'My trips. Accepted jobs.',
-      te: 'My trips. Accepted jobs.',
-    },
+  logistics_partner: {
+    home: mini('लॉजिस्टिक्स होम।', 'Logistics home.'),
+    jobs: mini('नई बुकिंग।', 'New bookings.'),
+    my_trips: mini('मेरी ट्रिप।', 'My trips.'),
+    earnings: mini('कमाई।', 'Earnings.'),
+    wallet: mini('वॉलेट।', 'Wallet.'),
   },
   buyer: {
-    home: {
-      hi: 'खरीदार होम। फसल देखने के लिए बोलें: फसल दिखाओ। या बोलें: मेरा ऑर्डर दिखाओ।',
-      en: 'Buyer home. Say: browse produce or show orders.',
-      kn: 'Buyer home. Produce browse ಅಥವಾ orders ನೋಡಿ.',
-      te: 'Buyer home. Produce browse లేదా orders చూడండి.',
-    },
-    browse: {
-      hi: 'ब्राउज़ स्क्रीन। यहाँ उपलब्ध फसल देखें और ऑर्डर करें।',
-      en: 'Browse screen. See produce and place an order.',
-      kn: 'Browse. Produce ನೋಡಿ.',
-      te: 'Browse. Produce చూడండి.',
-    },
-    orders: {
-      hi: 'ऑर्डर स्क्रीन। यहाँ आपके ऑर्डर दिखेंगे।',
-      en: 'Orders screen. Your orders are here.',
-      kn: 'Orders. ನಿಮ್ಮ orders ಇಲ್ಲಿ.',
-      te: 'Orders. మీ orders ఇక్కడ.',
-    },
+    home: mini('खरीदार होम।', 'Buyer home.'),
+    browse: mini('फसल ब्राउज़।', 'Browse produce.'),
+    orders: mini('ऑर्डर।', 'Orders.'),
+    wallet: mini('वॉलेट।', 'Wallet.'),
+    payments: mini('भुगतान।', 'Payments.'),
+  },
+  cold_storage_owner: {
+    home: mini('कोल्ड स्टोरेज होम।', 'Cold storage home.'),
+    slots: mini('स्लॉट।', 'Slots.'),
+    requests: mini('अनुरोध।', 'Requests.'),
+    earnings: mini('कमाई।', 'Earnings.'),
   },
 };
 
+export const voiceForView = (
+  role: 'farmer' | 'buyer' | 'logistics_partner' | 'cold_storage_owner',
+  view: string,
+  lang: Lang
+): string => {
+  const block = voiceContent[role] as Record<string, VoiceRow>;
+  const r = block[view];
+  return r?.[lang] ?? r?.hi ?? r?.en ?? landingVoice[lang] ?? '';
+};

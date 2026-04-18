@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserRole } from '../types';
-import { Tractor, Users, ShoppingBag, Truck } from 'lucide-react';
+import { Tractor, ShoppingBag, Truck, Warehouse } from 'lucide-react';
 
 interface LoginScreenProps {
   onRoleSelect: (role: UserRole) => void;
@@ -9,9 +9,9 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onRoleSelect }) => {
   const roles = [
     { id: UserRole.FARMER, icon: Tractor, color: "bg-green-100 text-green-700 border-green-200" },
-    { id: UserRole.FPO, icon: Users, color: "bg-blue-100 text-blue-700 border-blue-200" },
     { id: UserRole.BUYER, icon: ShoppingBag, color: "bg-purple-100 text-purple-700 border-purple-200" },
-    { id: UserRole.TRANSPORTER, icon: Truck, color: "bg-orange-100 text-orange-700 border-orange-200" },
+    { id: UserRole.LOGISTICS_PARTNER, icon: Truck, color: "bg-orange-100 text-orange-700 border-orange-200" },
+    { id: UserRole.COLD_STORAGE_OWNER, icon: Warehouse, color: "bg-cyan-100 text-cyan-800 border-cyan-200" },
   ];
 
   return (

@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { TransportOption } from "../types";
+import type { Lang } from "../i18n/translations";
 
 const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
@@ -65,16 +66,17 @@ export const generateTransportOptions = async (
   }
 };
 
-export const getSupportAdvice = async (issue: string, lang: 'hi' | 'en' = 'hi'): Promise<string> => {
+export const getSupportAdvice = async (issue: string, lang: Lang = 'hi'): Promise<string> => {
+  const promptLang: 'hi' | 'en' = lang === 'hi' ? 'hi' : 'en';
   if (!apiKey) {
-    return lang === 'hi'
+    return promptLang === 'hi'
       ? 'अभी इंटरनेट या API कुंजी नहीं है। मंडी जाएँ, स्थानीय खरीदार से भाव पूछें, और ट्रांसपोर्ट के लिए सारथी ऐप में पिकअप मांगें।'
       : 'No API key or connection. Visit your mandi, ask local buyers for rates, and request pickup in Saarthi.';
   }
 
   const model = "gemini-3-flash-preview";
   const prompt =
-    lang === 'hi'
+    promptLang === 'hi'
       ? `आप सारथी ऐप के सहायक हैं — छोटे किसानों के लिए सरल हिंदी में जवाब दें।
 प्रश्न: "${issue}"
 - मंडी भाव, कहाँ बेचें, ढुलाई/पिकअप — इन पर ध्यान दें।
@@ -90,10 +92,10 @@ Answer in plain English (short words). 3 bullet points. Cover mandi prices, wher
     });
     return (
       response.text ||
-      (lang === 'hi' ? 'अभी जवाब नहीं मिला। दोबारा कोशिश करें।' : "Sorry, I couldn't generate advice at this moment.")
+      (promptLang === 'hi' ? 'अभी जवाब नहीं मिला। दोबारा कोशिश करें।' : "Sorry, I couldn't generate advice at this moment.")
     );
   } catch (error) {
     console.error("Support API Error:", error);
-    return lang === 'hi' ? 'सर्वर में दिक्कत है। बाद में कोशिश करें।' : 'Technical difficulty. Please try again later.';
+    return promptLang === 'hi' ? 'सर्वर में दिक्कत है। बाद में कोशिश करें।' : 'Technical difficulty. Please try again later.';
   }
 };
