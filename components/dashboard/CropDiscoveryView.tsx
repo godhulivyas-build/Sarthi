@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { UserPreferences, ProduceItem } from '../../types';
+import { UserPreferences, ProduceItem, type PaymentRecord } from '../../types';
 import { listProduce, placeOrder } from '../../services/mvpDataService';
+import { createMockPayment } from '../../services/payments/mockPayment';
 import { useI18n } from '../../i18n/I18nContext';
 import { Search, MapPin, Loader2, IndianRupee } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -18,9 +19,11 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
   const [items, setItems] = useState<ProduceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [cropFilter, setCropFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
   const [orderFor, setOrderFor] = useState<ProduceItem | null>(null);
   const [qty, setQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [paymentReceipt, setPaymentReceipt] = useState<PaymentRecord | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -34,21 +37,27 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
   }, []);
 
   const filtered = items.filter((p) => {
-    if (!cropFilter) return true;
-    return p.crop.toLowerCase() === cropFilter.toLowerCase();
+    if (cropFilter && p.crop.toLowerCase() !== cropFilter.toLowerCase()) return false;
+    if (locationFilter && p.farmerLocation !== locationFilter) return false;
+    return true;
   });
 
   const submitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderFor || qty <= 0 || qty > orderFor.quantity) return;
     setSubmitting(true);
-    await placeOrder({
-      produceId: orderFor.id,
-      buyerName: preferences?.location?.trim() || t('dashboard.buyer'),
-      buyerLocation: preferences?.location?.trim() || '—',
-      quantity: qty,
-    });
-    setSubmitting(false);
+    try {
+      const order = await placeOrder({
+        produceId: orderFor.id,
+        buyerName: preferences?.location?.trim() || t('dashboard.buyer'),
+        buyerLocation: preferences?.location?.trim() || '—',
+        quantity: qty,
+      });
+      const pay = await createMockPayment(order.id, order.totalAmount);
+      setPaymentReceipt(pay);
+    } finally {
+      setSubmitting(false);
+    }
     setOrderFor(null);
     setQty(1);
     await load();
@@ -64,18 +73,37 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
       </h2>
 
       {/* Filter by crop — dropdown */}
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterCrop')}</label>
-        <select
-          value={cropFilter}
-          onChange={(e) => setCropFilter(e.target.value)}
-          className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base bg-white"
-        >
-          <option value="">{t('buyer.filterCrop')}…</option>
-          {CROP_OPTIONS.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterCrop')}</label>
+          <select
+            value={cropFilter}
+            onChange={(e) => setCropFilter(e.target.value)}
+            className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base bg-white"
+          >
+            <option value="">{t('buyer.filterCrop')}…</option>
+            {CROP_OPTIONS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-sm font-semibold text-gray-700 mb-1 block">{t('buyer.filterLocation')}</label>
+          <select
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            className="w-full min-h-[48px] border border-gray-300 rounded-xl px-3 py-2 text-base bg-white"
+          >
+            <option value="">{t('buyer.filterLocation')}…</option>
+            {uniqueLocations.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -121,6 +149,41 @@ export const CropDiscoveryView: React.FC<CropDiscoveryViewProps> = ({ preference
       )}
 
       {/* Order modal — quantity preset buttons */}
+      {paymentReceipt && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-5 shadow-xl space-y-3">
+            <p className="font-bold text-lg text-green-700">{t('buyer.paymentSuccess')}</p>
+            <p className="text-xs text-gray-500">{paymentReceipt.orderId}</p>
+            <p className="text-sm font-semibold">{t('buyer.splitTitle')}</p>
+            <ul className="text-sm space-y-1 border rounded-xl p-3 bg-gray-50">
+              <li className="flex justify-between">
+                <span>{t('buyer.splitFarmer')}</span>
+                <span className="font-bold">₹{paymentReceipt.split.farmer}</span>
+              </li>
+              <li className="flex justify-between">
+                <span>{t('buyer.splitLogistics')}</span>
+                <span className="font-bold">₹{paymentReceipt.split.logistics}</span>
+              </li>
+              <li className="flex justify-between">
+                <span>{t('buyer.splitPlatform')}</span>
+                <span className="font-bold">₹{paymentReceipt.split.platform}</span>
+              </li>
+              <li className="flex justify-between pt-2 border-t font-extrabold">
+                <span>{t('buyer.splitTotal')}</span>
+                <span>₹{paymentReceipt.split.total}</span>
+              </li>
+            </ul>
+            <button
+              type="button"
+              className="w-full min-h-[48px] rounded-xl bg-purple-600 text-white font-bold"
+              onClick={() => setPaymentReceipt(null)}
+            >
+              {t('back')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {orderFor && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
           <form

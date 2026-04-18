@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserPreferences, LogisticsJob, LogisticsJobStatus } from '../../types';
 import {
   listLogisticsJobs,
@@ -11,18 +11,22 @@ import { Loader2, Truck } from 'lucide-react';
 type LogisticsJobsViewProps = {
   preferences: UserPreferences | null;
   refreshKey?: number;
+  listMode?: 'open' | 'mine';
 };
 
-const transporterId = 'me';
+const driverId = 'me';
 
-export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({ preferences, refreshKey = 0 }) => {
-  const { t, lang } = useI18n();
+export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({
+  preferences,
+  refreshKey = 0,
+  listMode = 'open',
+}) => {
+  const { t } = useI18n();
   const [jobs, setJobs] = useState<LogisticsJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const name =
-    preferences?.location?.trim() || t('dashboard.driver');
+  const name = preferences?.location?.trim() || t('dashboard.driver');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -35,9 +39,16 @@ export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({ preference
     load();
   }, [load, refreshKey]);
 
+  const visibleJobs = useMemo(() => {
+    if (listMode === 'mine') {
+      return jobs.filter((j) => j.acceptedByTransporterId === driverId);
+    }
+    return jobs.filter((j) => j.status === 'open');
+  }, [jobs, listMode]);
+
   const onAccept = async (jobId: string) => {
     setBusy(jobId);
-    await acceptLogisticsJob(jobId, transporterId, name);
+    await acceptLogisticsJob(jobId, driverId, name);
     setBusy(null);
     await load();
   };
@@ -61,13 +72,13 @@ export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({ preference
     <div className="p-4 pb-24 space-y-4">
       <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
         <Truck className="text-orange-600" aria-hidden />
-        {t('jobs.title')}
+        {listMode === 'mine' ? t('dashboard.myTrips') : t('jobs.title')}
       </h2>
-      {jobs.length === 0 ? (
+      {visibleJobs.length === 0 ? (
         <p className="text-center text-gray-500 py-10 bg-gray-50 rounded-xl border border-dashed">{t('jobs.empty')}</p>
       ) : (
         <ul className="space-y-3">
-          {jobs.map((job) => (
+          {visibleJobs.map((job) => (
             <li key={job.id} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm space-y-2">
               <p className="font-bold text-gray-900">{job.crop}</p>
               <p className="text-sm text-gray-600">
@@ -75,7 +86,7 @@ export const LogisticsJobsView: React.FC<LogisticsJobsViewProps> = ({ preference
               </p>
               <p className="text-xs text-gray-500">{job.farmerName}</p>
               <p className="text-xs font-semibold text-orange-700">{job.status}</p>
-              {job.status === 'open' && (
+              {job.status === 'open' && listMode === 'open' && (
                 <button
                   type="button"
                   disabled={busy === job.id}

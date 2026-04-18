@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserRole } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { ScreenChrome } from './layout/ScreenChrome';
@@ -6,21 +7,25 @@ import { SaathiDidi } from './SaathiDidi';
 import { AgriImages } from './landing/AgriImages';
 import LiveMapSection from './landing/LiveMapSection';
 import MandiPriceTicker from './landing/MandiPriceTicker';
-import { Tractor, ShoppingBag, Truck, BadgeCheck, TrendingUp, MapPin, Bell, Phone, Mail } from 'lucide-react';
+import { Tractor, ShoppingBag, Truck, Warehouse, BadgeCheck, TrendingUp, MapPin, Bell, Phone, Mail } from 'lucide-react';
 import type { TranslationKey } from '../i18n/translations';
 import { useAppState } from '../state/AppState';
+import { useV2Session } from '../state/v2Session';
 import { CONTACT } from '../config/contact';
+import type { SaarthiUserRole } from '../types';
 
 const roles: {
   role: UserRole;
+  persona: SaarthiUserRole;
   icon: typeof Tractor;
   titleKey: TranslationKey;
   descKey: TranslationKey;
   color: string;
 }[] = [
-  { role: UserRole.FARMER, icon: Tractor, titleKey: 'landing.roleFarmer', descKey: 'landing.roleFarmerDesc', color: 'bg-green-100 text-green-800 border-green-200' },
-  { role: UserRole.BUYER, icon: ShoppingBag, titleKey: 'landing.roleBuyer', descKey: 'landing.roleBuyerDesc', color: 'bg-purple-100 text-purple-800 border-purple-200' },
-  { role: UserRole.TRANSPORTER, icon: Truck, titleKey: 'landing.roleTransporter', descKey: 'landing.roleTransporterDesc', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+  { role: UserRole.FARMER, persona: 'farmer', icon: Tractor, titleKey: 'landing.roleFarmer', descKey: 'landing.roleFarmerDesc', color: 'bg-green-100 text-green-800 border-green-200' },
+  { role: UserRole.BUYER, persona: 'buyer', icon: ShoppingBag, titleKey: 'landing.roleBuyer', descKey: 'landing.roleBuyerDesc', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+  { role: UserRole.LOGISTICS_PARTNER, persona: 'logistics_partner', icon: Truck, titleKey: 'landing.roleLogistics', descKey: 'landing.roleLogisticsDesc', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+  { role: UserRole.COLD_STORAGE_OWNER, persona: 'cold_storage_owner', icon: Warehouse, titleKey: 'landing.roleCold', descKey: 'landing.roleColdDesc', color: 'bg-cyan-100 text-cyan-900 border-cyan-200' },
 ];
 
 const advantages: { icon: typeof BadgeCheck; titleKey: TranslationKey; descKey: TranslationKey; iconColor: string }[] = [
@@ -38,11 +43,31 @@ const steps: { titleKey: TranslationKey; descKey: TranslationKey }[] = [
 
 export const LandingPage: React.FC = () => {
   const { t } = useI18n();
-  const { setCurrentScreen, setUserRoleFromEnum } = useAppState();
+  const navigate = useNavigate();
+  const { setCurrentScreen, setUserRoleFromEnum, setLang } = useAppState();
+  const { completeDemo } = useV2Session();
   const joinRef = React.useRef<HTMLDivElement | null>(null);
 
   const scrollToJoin = () =>
     setTimeout(() => joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+
+  const goOnboarding = () => navigate('/onboarding');
+
+  const quickDemo = (persona: SaarthiUserRole) => {
+    completeDemo(persona);
+    setUserRoleFromEnum(
+      persona === 'farmer'
+        ? UserRole.FARMER
+        : persona === 'buyer'
+          ? UserRole.BUYER
+          : persona === 'logistics_partner'
+            ? UserRole.LOGISTICS_PARTNER
+            : UserRole.COLD_STORAGE_OWNER
+    );
+    setLang('hi');
+    setCurrentScreen('dashboard');
+    navigate('/app');
+  };
 
   return (
     <ScreenChrome>
@@ -58,13 +83,22 @@ export const LandingPage: React.FC = () => {
               <p className="text-green-100 mt-3 text-base leading-relaxed max-w-xl">
                 {t('landing.whatBody')}
               </p>
-              <button
-                type="button"
-                onClick={scrollToJoin}
-                className="mt-5 min-h-[56px] px-8 rounded-2xl bg-white text-green-800 font-extrabold text-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-              >
-                {t('landing.startNow')}
-              </button>
+              <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={goOnboarding}
+                  className="min-h-[56px] px-8 rounded-2xl bg-white text-green-800 font-extrabold text-lg shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                >
+                  {t('landing.startNow')}
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollToJoin}
+                  className="min-h-[56px] px-6 rounded-2xl bg-white/15 border border-white/40 text-white font-bold text-sm hover:bg-white/25 transition-all"
+                >
+                  {t('landing.joinTitle')}
+                </button>
+              </div>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold anim-fade anim-delay-3">
                 <span className="bg-white/20 px-3 py-1 rounded-full">{t('landing.stats1')}</span>
                 <span className="bg-white/20 px-3 py-1 rounded-full">{t('landing.stats2')}</span>
@@ -130,14 +164,11 @@ export const LandingPage: React.FC = () => {
             <h2 className="text-xl font-extrabold text-gray-900 mb-2 text-center">{t('landing.joinTitle')}</h2>
             <p className="text-sm text-gray-600 text-center mb-4">{t('landing.joinSubtitle')}</p>
             <div className="space-y-3 max-w-lg mx-auto">
-              {roles.map(({ role, icon: Icon, titleKey, descKey, color }, i) => (
+              {roles.map(({ role, persona, icon: Icon, titleKey, descKey, color }, i) => (
                 <button
                   key={role}
                   type="button"
-                  onClick={() => {
-                    setUserRoleFromEnum(role);
-                    setCurrentScreen('dashboard');
-                  }}
+                  onClick={() => quickDemo(persona)}
                   className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 bg-white text-left shadow-sm hover:shadow-lg hover:-translate-y-1 active:scale-[0.98] transition-all duration-200 min-h-[60px] anim-scale anim-delay-${i + 1} ${color}`}
                 >
                   <div className="p-3 rounded-xl bg-white/80 border border-current/20">

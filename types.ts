@@ -1,9 +1,12 @@
-export type SaarthiUserRole = 'farmer' | 'transporter' | 'buyer';
+export type SaarthiUserRole = 'farmer' | 'buyer' | 'logistics_partner' | 'cold_storage_owner';
 
 export enum UserRole {
   FARMER = 'Farmer (Kisan)',
   BUYER = 'Buyer (Vyapari)',
-  TRANSPORTER = 'Transporter'
+  /** @deprecated use LOGISTICS_PARTNER */
+  TRANSPORTER = 'Transporter',
+  LOGISTICS_PARTNER = 'Logistics Partner',
+  COLD_STORAGE_OWNER = 'Cold Storage Owner',
 }
 
 export enum AppScreen {
@@ -14,14 +17,28 @@ export enum AppScreen {
 
 export type SaarthiScreen = 'landing' | 'dashboard';
 
-export type FarmerDashboardView = 'home' | 'book_vehicle' | 'my_requests' | 'weather' | 'prices' | 'alerts';
-export type TransporterDashboardView = 'home' | 'jobs' | 'my_trips';
-export type BuyerDashboardView = 'home' | 'browse' | 'orders';
+export type FarmerDashboardView =
+  | 'home'
+  | 'book_vehicle'
+  | 'my_requests'
+  | 'weather'
+  | 'prices'
+  | 'alerts'
+  | 'nearby_buyers'
+  | 'cold_nearby'
+  | 'wallet'
+  | 'payments'
+  | 'track';
+
+export type LogisticsDashboardView = 'home' | 'jobs' | 'my_trips' | 'earnings' | 'wallet';
+export type BuyerDashboardView = 'home' | 'browse' | 'orders' | 'wallet' | 'payments';
+export type ColdStorageDashboardView = 'home' | 'slots' | 'requests' | 'earnings';
 
 export type SaarthiDashboardView =
   | { role: 'farmer'; view: FarmerDashboardView }
-  | { role: 'transporter'; view: TransporterDashboardView }
-  | { role: 'buyer'; view: BuyerDashboardView };
+  | { role: 'logistics_partner'; view: LogisticsDashboardView }
+  | { role: 'buyer'; view: BuyerDashboardView }
+  | { role: 'cold_storage_owner'; view: ColdStorageDashboardView };
 
 export enum DashboardView {
   HOME = 'HOME',
@@ -189,4 +206,50 @@ export interface LogisticsJob {
   acceptedByTransporterId?: string;
   acceptedByTransporterName?: string;
   updatedAt: string;
+}
+
+/** V2 persisted session (localStorage) — production-upgradable to JWT */
+export interface V2AuthSession {
+  version: 1;
+  phone: string;
+  name: string;
+  preferredLang: 'hi' | 'en' | 'kn' | 'te';
+  persona: SaarthiUserRole | null;
+  addressLabel: string;
+  lat: number | null;
+  lng: number | null;
+  otpVerified: boolean;
+  onboardingComplete: boolean;
+}
+
+export interface ColdStorageSlot {
+  id: string;
+  label: string;
+  capacityTons: number;
+  usedTons: number;
+  pricePerTonDay: number;
+}
+
+export interface ColdStorageRequest {
+  id: string;
+  farmerName: string;
+  crop: string;
+  tons: number;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: string;
+}
+
+export interface PaymentSplit {
+  farmer: number;
+  logistics: number;
+  platform: number;
+  total: number;
+}
+
+export interface PaymentRecord {
+  id: string;
+  orderId: string;
+  status: 'created' | 'paid' | 'failed';
+  split: PaymentSplit;
+  createdAt: string;
 }

@@ -47,7 +47,7 @@ export const SupportView: React.FC<SupportViewProps> = ({ embedded }) => {
       onerror: (() => void) | null;
       onend: (() => void) | null;
     };
-    rec.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+    rec.lang = lang === 'hi' ? 'hi-IN' : lang === 'kn' ? 'kn-IN' : lang === 'te' ? 'te-IN' : 'en-IN';
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = (ev) => {

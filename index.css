@@ -1,0 +1,31 @@
+/* Sarthi Setu V2 — design tokens (Pragati Sangam / Stitch reference) */
+:root {
+  --saarthi-bg: #f7fbf0;
+  --saarthi-surface: #fafaf5;
+  --saarthi-surface-low: #f1f5eb;
+  --saarthi-surface-high: #e5eadf;
+  --saarthi-surface-highest: #e0e4da;
+  --saarthi-on-surface: #181d17;
+  --saarthi-on-surface-variant: #40493d;
+  --saarthi-primary: #0d631b;
+  --saarthi-primary-container: #2e7d32;
+  --saarthi-on-primary: #ffffff;
+  --saarthi-secondary: #8b5000;
+  --saarthi-secondary-container: #ff9800;
+  --saarthi-on-secondary: #ffffff;
+  --saarthi-tertiary: #005a8c;
+  --saarthi-tertiary-rgb: 0, 90, 140;
+  --saarthi-outline: #707a6c;
+  --saarthi-radius-lg: 1.5rem;
+  --saarthi-radius-xl: 2rem;
+  --saarthi-shadow-float: 0 12px 32px -4px rgba(47, 49, 46, 0.08);
+}
+
+body.saarthi-v2 {
+  background-color: var(--saarthi-bg);
+  color: var(--saarthi-on-surface);
+}
+
+.saarthi-headline {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
