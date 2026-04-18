@@ -8,6 +8,8 @@ import type { SaarthiUserRole } from '../../../types';
 import { requestOtp, verifyOtp } from '../../../services/auth/mockOtp';
 import { Button } from '../../ui/Button';
 import { MapPin } from 'lucide-react';
+import { SinglePinLocationMap } from '../maps/SinglePinLocationMap';
+import { MP_CENTER } from '../../../config/mpLocations';
 
 const LANGS: Lang[] = ['hi', 'en', 'kn', 'te'];
 
@@ -222,12 +224,22 @@ export const OnboardingWizard: React.FC = () => {
         <div className="space-y-4 mt-6">
           <h2 className="text-lg font-bold">{tV2('v2.onboard.locationTitle')}</h2>
           <p className="text-sm text-gray-600">{tV2('v2.onboard.locationHint')}</p>
+          <p className="text-xs text-gray-500">{tV2('v2.onboard.mapHint')}</p>
+          <SinglePinLocationMap
+            lat={session.lat}
+            lng={session.lng}
+            defaultCenter={MP_CENTER}
+            onChange={(lat, lng) => {
+              updateSession({ lat, lng });
+            }}
+          />
           <div className="relative">
             <MapPin className="absolute left-3 top-3.5 text-gray-400" size={20} />
             <input
               className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 pl-11 pr-4 text-lg bg-white"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              placeholder={tV2('v2.onboard.locationHint')}
             />
           </div>
           <Button type="button" variant="outline" fullWidth onClick={useGps}>
