@@ -2,10 +2,8 @@ import React from 'react';
 import { UserRole } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { ScreenChrome } from './layout/ScreenChrome';
-import { VoiceMic } from './VoiceMic';
 import { SaathiDidi } from './SaathiDidi';
 import { AgriImages } from './landing/AgriImages';
-import { WhatsAppFloat } from './WhatsAppFloat';
 import LiveMapSection from './landing/LiveMapSection';
 import MandiPriceTicker from './landing/MandiPriceTicker';
 import { Tractor, ShoppingBag, Truck, BadgeCheck, TrendingUp, MapPin, Bell, Phone, Mail } from 'lucide-react';
@@ -189,8 +187,6 @@ export const LandingPage: React.FC = () => {
         </footer>
       </div>
       <SaathiDidi />
-      <WhatsAppFloat />
-      <VoiceMic />
     </ScreenChrome>
   );
 };

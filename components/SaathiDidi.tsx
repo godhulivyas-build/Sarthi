@@ -1,37 +1,71 @@
 import React from 'react';
+import { Mic, Volume2, Loader2, MessageCircle } from 'lucide-react';
 import { useVoiceAssistant } from '../voice/VoiceAssistantProvider';
 import { useI18n } from '../i18n/I18nContext';
+import { CONTACT } from '../config/contact';
 
 export const SaathiDidi: React.FC = () => {
-  const { toggle, speaking, listening } = useVoiceAssistant();
-  const { lang } = useI18n();
+  const { toggle, speaking, listening, processing } = useVoiceAssistant();
+  const { t } = useI18n();
+
+  const whatsappHref = `https://wa.me/${CONTACT.phoneE164}?text=${encodeURIComponent(CONTACT.whatsappPrefill)}`;
 
   return (
-    <div className="fixed bottom-24 left-4 z-[75] max-w-[260px]">
+    <div className="fixed bottom-24 left-4 z-[75] max-w-[260px] flex flex-col gap-2">
+      {/* Mic and WhatsApp buttons above the dialogue card */}
+      <div className="flex gap-2 justify-end">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noreferrer"
+          className="w-12 h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center border-2 border-white active:scale-95"
+          aria-label="WhatsApp"
+          title="WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6" aria-hidden />
+        </a>
+
+        <button
+          type="button"
+          onClick={toggle}
+          className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 active:scale-95 ${
+            listening || speaking
+              ? 'bg-red-600 text-white border-red-600'
+              : 'bg-white text-green-700 border-green-200'
+          }`}
+          aria-label="Mic"
+          title="Mic"
+        >
+          {processing ? (
+            <Loader2 className="w-6 h-6 animate-spin" />
+          ) : speaking ? (
+            <Volume2 className="w-6 h-6" />
+          ) : (
+            <Mic className="w-6 h-6" />
+          )}
+        </button>
+      </div>
+
+      {/* Saathi Didi dialogue card */}
       <button
         type="button"
         onClick={toggle}
         className={`w-full flex items-center gap-3 bg-white border-2 rounded-2xl p-3 shadow-lg active:scale-[0.99] ${
           speaking || listening ? 'border-red-300' : 'border-green-200'
         }`}
-        aria-label="Saathi Didi"
+        aria-label={t('saathiDidi.name')}
       >
-        <div className="relative">
+        <div className="relative shrink-0">
           <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-lg">
             SD
           </div>
           <span className="absolute -inset-1 rounded-full border-2 border-green-300 animate-pulse" aria-hidden />
         </div>
         <div className="text-left">
-          <p className="font-bold text-gray-900">Saathi Didi</p>
-          <p className="text-xs text-gray-600 leading-snug">
-            {lang === 'en'
-              ? 'Tap me. I will explain and listen.'
-              : 'Agar samajh nahi aa raha, toh mujhe dabaiye. Main madad karti hoon.'}
-          </p>
+          <p className="font-bold text-gray-900">{t('saathiDidi.name')}</p>
+          <p className="text-xs text-gray-600 leading-snug">{t('saathiDidi.prompt')}</p>
         </div>
       </button>
     </div>
   );
 };
-
