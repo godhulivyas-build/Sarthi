@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
-import { AppScreen, SaarthiDashboardView, SaarthiScreen, SaarthiUserRole, UserRole } from '../types';
+import { SaarthiDashboardView, SaarthiScreen, SaarthiUserRole, UserRole } from '../types';
 import { translations, type Lang, type TranslationKey } from '../i18n/translations';
+import { tV2, type V2Key } from '../i18n/v2';
 
 export type AppState = {
   userRole: SaarthiUserRole | null;
@@ -43,11 +44,7 @@ const reducer = (state: AppState, action: AppAction): AppState => {
     case 'LOGOUT':
       return { ...state, userRole: null, currentScreen: 'landing', currentDashboardView: null };
     case 'SYNC_ROLE_ENUM_TO_STRING': {
-      // Back-compat helper while refactoring: if some code still dispatches enum roles,
-      // keep state coherent by mapping known labels.
-      const mapped =
-        state.userRole ??
-        null;
+      const mapped = state.userRole ?? null;
       return { ...state, userRole: mapped };
     }
     default:
@@ -59,12 +56,12 @@ type AppStateContextValue = {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   t: (key: TranslationKey) => string;
+  tV2: (key: V2Key) => string;
   setLang: (lang: Lang) => void;
   setUserRole: (role: SaarthiUserRole | null) => void;
   setCurrentScreen: (screen: SaarthiScreen) => void;
   setCurrentDashboardView: (view: SaarthiDashboardView | null) => void;
   logout: () => void;
-  // Convenience mappers for existing enum-based UI during transition
   setUserRoleFromEnum: (role: UserRole) => void;
 };
 
@@ -81,6 +78,8 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [state.lang]
   );
 
+  const tV2cb = useCallback((key: V2Key) => tV2(state.lang, key), [state.lang]);
+
   const setLang = useCallback((lang: Lang) => dispatch({ type: 'SET_LANG', lang }), []);
   const setUserRole = useCallback((role: SaarthiUserRole | null) => dispatch({ type: 'SET_ROLE', role }), []);
   const setCurrentScreen = useCallback((screen: SaarthiScreen) => dispatch({ type: 'SET_SCREEN', screen }), []);
@@ -89,20 +88,21 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     []
   );
   const logout = useCallback(() => dispatch({ type: 'LOGOUT' }), []);
-  const setUserRoleFromEnum = useCallback(
-    (role: UserRole) => {
-      const mapped: SaarthiUserRole =
-        role === UserRole.FARMER ? 'farmer' : role === UserRole.TRANSPORTER ? 'transporter' : 'buyer';
-      dispatch({ type: 'SET_ROLE', role: mapped });
-    },
-    []
-  );
+  const setUserRoleFromEnum = useCallback((role: UserRole) => {
+    let mapped: SaarthiUserRole = 'buyer';
+    if (role === UserRole.FARMER) mapped = 'farmer';
+    else if (role === UserRole.BUYER) mapped = 'buyer';
+    else if (role === UserRole.LOGISTICS_PARTNER || role === UserRole.TRANSPORTER) mapped = 'logistics_partner';
+    else if (role === UserRole.COLD_STORAGE_OWNER) mapped = 'cold_storage_owner';
+    dispatch({ type: 'SET_ROLE', role: mapped });
+  }, []);
 
   const value = useMemo(
     () => ({
       state,
       dispatch,
       t,
+      tV2: tV2cb,
       setLang,
       setUserRole,
       setUserRoleFromEnum,
@@ -110,7 +110,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setCurrentDashboardView,
       logout,
     }),
-    [state, t, setLang, setUserRole, setUserRoleFromEnum, setCurrentScreen, setCurrentDashboardView, logout]
+    [state, t, tV2cb, setLang, setUserRole, setUserRoleFromEnum, setCurrentScreen, setCurrentDashboardView, logout]
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
@@ -122,3 +122,9 @@ export const useAppState = (): AppStateContextValue => {
   return ctx;
 };
 
+export const saarthiRoleToUserRole = (role: SaarthiUserRole): UserRole => {
+  if (role === 'farmer') return UserRole.FARMER;
+  if (role === 'buyer') return UserRole.BUYER;
+  if (role === 'logistics_partner') return UserRole.LOGISTICS_PARTNER;
+  return UserRole.COLD_STORAGE_OWNER;
+};

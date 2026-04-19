@@ -8,6 +8,10 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# Nested duplicate trees (not part of the Vite app root)
+/Sarthi-main/
+/github-main/
+
 dist
 dist-ssr
 *.local

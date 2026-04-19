@@ -1,5 +1,17 @@
 # Sarthi — AI-Enabled Agri Logistics Platform
 
+## Sarthi Setu web app (Vite + React)
+
+This repository includes a **Vite** front-end for **Sarthi Setu** (farmer, buyer, logistics partner, cold storage). Active product work for the V2 redesign lives on branch **`v2-redesign`**; **`main`** stays the default production-safe line until you merge.
+
+- **Run locally:** `npm install` then `npm run dev` (default dev server port **3000**).
+- **Production build:** `npm run build`.
+- **Routes:** `/` landing, `/onboarding` seven-step sign-up (mock OTP **`123456`** in development), `/app` role dashboards (requires a completed session in `localStorage` under `saarthi.v2.session`).
+- **Environment:** copy `.env.example` to `.env`. Set `GEMINI_API_KEY` for AI chat; `VITE_GOOGLE_MAPS_API_KEY` enables **embedded Google Maps** (Directions API for driving routes, draggable A/B pins, “Open in Google Maps” for turn-by-turn navigation). In Google Cloud, enable **Maps JavaScript API** and **Directions API** for that key. **Without a key**, booking and onboarding maps use **OpenStreetMap tiles** and the public **OSRM** routing demo (free, rate-limited—fine for demos). `VITE_RAZORPAY_KEY_ID` is reserved for a future real checkout path (payments use a mock flow today).
+- **Vercel:** connect the repo and deploy **`main`** for production. Open a **Preview** deployment for branch **`v2-redesign`** to review the redesign before merging into `main`.
+
+---
+
 **Sarthi** is an AI-augmented logistics solution designed to simplify farm-to-market transport for farmers and traders.  
 By combining user research insights with digital workflows, Sarthi improves delivery efficiency, transparency, and trust across agricultural supply chains.
 

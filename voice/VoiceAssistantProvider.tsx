@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../state/AppState';
-import { landingVoice, voiceContent } from './voiceContent';
+import { landingVoice, voiceForView } from './voiceContent';
 import type { Lang } from '../i18n/translations';
 
 type VoiceAssistantContextValue = {
@@ -56,6 +57,11 @@ type Intent =
   | 'NAV_TRIPS'
   | 'NAV_BROWSE'
   | 'NAV_ORDERS'
+  | 'NAV_PRICES'
+  | 'NAV_NEARBY_BUYERS'
+  | 'NAV_PAYMENT'
+  | 'NAV_TRACK'
+  | 'NAV_COLD'
   | 'HELP'
   | 'UNKNOWN';
 
@@ -82,6 +88,13 @@ const parseIntent = (raw: string): Intent => {
   if (t.includes('request') || t.includes('रिक्वेस्ट') || t.includes('requests')) return 'NAV_REQUESTS';
   if (t.includes('trip') || t.includes('trips') || t.includes('ट्रिप')) return 'NAV_TRIPS';
   if (t.includes('home') || t.includes('होम')) return 'NAV_HOME';
+  if (t.includes('mandi') || t.includes('मंडी') || (t.includes('bhav') || t.includes('भाव'))) return 'NAV_PRICES';
+  if ((t.includes('buyer') || t.includes('खरीदार')) && (t.includes('dikhao') || t.includes('दिख') || t.includes('show'))) {
+    return 'NAV_NEARBY_BUYERS';
+  }
+  if (t.includes('payment') || t.includes('भुगतान') || t.includes('pay')) return 'NAV_PAYMENT';
+  if (t.includes('track') || t.includes('ट्रैक') || t.includes('shipment')) return 'NAV_TRACK';
+  if (t.includes('cold') || t.includes('कोल्ड') || (t.includes('storage') && t.includes('cold'))) return 'NAV_COLD';
   if (t.includes('madad') || t.includes('मदद') || t.includes('help') || t.includes('sahayata') || t.includes('सहायता'))
     return 'HELP';
 
@@ -94,7 +107,8 @@ const unknownText = (lang: Lang): string => {
 };
 
 export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { state, setCurrentDashboardView } = useAppState();
+  const { state, setCurrentDashboardView, setCurrentScreen } = useAppState();
+  const navigate = useNavigate();
   const recognitionRef = useRef<any | null>(null);
 
   const [speakingState, setSpeakingState] = useState(false);
@@ -105,13 +119,20 @@ export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = (
     const lang = state.lang;
     if (state.currentScreen === 'landing') return landingVoice[lang] || landingVoice.hi!;
     if (!state.userRole || !state.currentDashboardView) return landingVoice[lang] || landingVoice.hi!;
-    const row = (voiceContent as any)[state.userRole]?.[state.currentDashboardView.view] as Partial<Record<Lang, string>> | undefined;
-    return row?.[lang] || row?.hi || landingVoice[lang] || landingVoice.hi!;
+    return voiceForView(state.userRole, state.currentDashboardView.view, lang) || landingVoice[lang] || landingVoice.hi!;
   }, [state.currentScreen, state.userRole, state.currentDashboardView, state.lang]);
 
   const applyIntent = (intent: Intent) => {
     const role = state.userRole;
-    if (!role) return;
+    if (!role) {
+      if (intent === 'HELP') return;
+      if (intent !== 'UNKNOWN') navigate('/onboarding');
+      return;
+    }
+    if (state.currentScreen !== 'dashboard') {
+      setCurrentScreen('dashboard');
+      navigate('/app');
+    }
     if (intent === 'NAV_HOME') return setCurrentDashboardView({ role, view: 'home' } as any);
     if (intent === 'NAV_BOOK') {
       if (role === 'farmer') return setCurrentDashboardView({ role, view: 'book_vehicle' });
@@ -119,10 +140,17 @@ export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = (
       return setCurrentDashboardView({ role, view: 'jobs' });
     }
     if (intent === 'NAV_REQUESTS' && role === 'farmer') return setCurrentDashboardView({ role, view: 'my_requests' });
-    if (intent === 'NAV_JOBS' && role === 'transporter') return setCurrentDashboardView({ role, view: 'jobs' });
-    if (intent === 'NAV_TRIPS' && role === 'transporter') return setCurrentDashboardView({ role, view: 'my_trips' });
+    if (intent === 'NAV_JOBS' && role === 'logistics_partner') return setCurrentDashboardView({ role, view: 'jobs' });
+    if (intent === 'NAV_TRIPS' && role === 'logistics_partner') return setCurrentDashboardView({ role, view: 'my_trips' });
     if (intent === 'NAV_BROWSE' && role === 'buyer') return setCurrentDashboardView({ role, view: 'browse' });
     if (intent === 'NAV_ORDERS' && role === 'buyer') return setCurrentDashboardView({ role, view: 'orders' });
+    if (intent === 'NAV_PRICES' && role === 'farmer') return setCurrentDashboardView({ role, view: 'prices' });
+    if (intent === 'NAV_NEARBY_BUYERS' && role === 'farmer') return setCurrentDashboardView({ role, view: 'nearby_buyers' });
+    if (intent === 'NAV_PAYMENT' && (role === 'farmer' || role === 'buyer')) {
+      return setCurrentDashboardView({ role, view: 'payments' } as any);
+    }
+    if (intent === 'NAV_TRACK' && role === 'farmer') return setCurrentDashboardView({ role, view: 'track' });
+    if (intent === 'NAV_COLD' && role === 'cold_storage_owner') return setCurrentDashboardView({ role, view: 'slots' });
     if (intent === 'HELP') return setCurrentDashboardView({ role, view: 'home' } as any);
   };
 
