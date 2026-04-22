@@ -6,11 +6,16 @@ import { getDistrictByName, LOCATION_NAMES } from '../../../config/mpLocations';
 import { listProduce, requestPickup } from '../../../services/mvpDataService';
 import type { ProduceItem, UserPreferences } from '../../../types';
 import { Button } from '../../ui/Button';
-import { Loader2, MapPinned, Truck, ExternalLink } from 'lucide-react';
+import { Loader2, MapPinned, Truck, ExternalLink, Mic, ArrowLeftRight } from 'lucide-react';
 import { BookingRouteMapInner } from '../maps/InteractiveBookingMap';
 import { FallbackOsrmLeafletMap } from '../maps/FallbackOsrmLeafletMap';
 import type { LatLng, DrivingRouteResult } from '../../../services/maps/routePlanning';
 import { buildGoogleMapsDirUrl } from '../../../services/maps/routePlanning';
+import { computeMoistureImpact } from '../../../services/moisturePriceModel';
+import { PayoutBreakdown } from '../ui/PayoutBreakdown';
+import { CONTACT } from '../../../config/contact';
+import { buildWhatsAppLink, templateBookingConfirmation, templateTestimonialRequest } from '../../../services/whatsappTemplates';
+import { useVoiceAssistant } from '../../../voice/VoiceAssistantProvider';
 
 const CITY_OPTIONS = LOCATION_NAMES.slice(0, 28);
 
@@ -33,11 +38,15 @@ type Props = {
 
 export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }) => {
   const { t, tV2 } = useI18n();
+  const { dictateOnce, listening } = useVoiceAssistant();
   const [from, setFrom] = useState(preferences?.location?.trim() || 'Indore');
   const [to, setTo] = useState('Bhopal');
   const [produce, setProduce] = useState<ProduceItem[]>([]);
   const [produceId, setProduceId] = useState('');
   const [qty, setQty] = useState(5);
+  const [moisturePct, setMoisturePct] = useState(14);
+  const [needReturn, setNeedReturn] = useState(false);
+  const [returnLoadKg, setReturnLoadKg] = useState(250);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -86,8 +95,21 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
   }, [routeMeta, pickAdjust, dropAdjust]);
 
   const estimateInr = Math.max(800, Math.round(distanceKm * 42 * (1 + qty / 100)));
+  const returnSavingsInr = useMemo(() => {
+    if (!needReturn) return 0;
+    // Pilot heuristic: a matched backhaul can reduce effective one-way cost by ~12–22%.
+    const base = estimateInr;
+    const pct = 0.16 + Math.min(0.06, Math.max(0, (returnLoadKg - 200) / 1000));
+    return Math.round(base * Math.min(0.22, Math.max(0.12, pct)));
+  }, [needReturn, estimateInr, returnLoadKg]);
+  const split = useMemo(() => {
+    const platform = Math.round(estimateInr * 0.05);
+    const logistics = estimateInr - platform;
+    return { logistics, platform, total: estimateInr };
+  }, [estimateInr]);
 
   const selected = produce.find((p) => p.id === produceId);
+  const moisture = useMemo(() => computeMoistureImpact(selected?.crop || 'Soybean', moisturePct), [selected?.crop, moisturePct]);
 
   const nearby = useMemo(
     () => [
@@ -98,6 +120,7 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
   );
 
   const navHref = buildGoogleMapsDirUrl(pickAdjust, dropAdjust);
+  const bookingId = useMemo(() => `bk-${Date.now().toString(36)}`, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +133,7 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
       dropLocation: `${to} (${dropAdjust.lat.toFixed(4)},${dropAdjust.lng.toFixed(4)})`,
       quantity: qty,
       unit: selected.unit,
+      estimatedFareInr: estimateInr,
     });
     setSubmitting(false);
     setDone(true);
@@ -129,6 +153,39 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
       <div className="p-6 text-center pb-24">
         <Truck className="w-14 h-14 text-[var(--saarthi-primary)] mx-auto mb-3" />
         <p className="text-lg font-bold">{t('pickup.submit')} ✓</p>
+        <p className="mt-2 text-xs text-[var(--saarthi-on-surface-variant)]">Booking id: {bookingId}</p>
+        <div className="mt-5 space-y-2">
+          <a
+            href={buildWhatsAppLink(
+              templateBookingConfirmation({
+                crop: selected?.crop || 'Crop',
+                qty,
+                unit: selected?.unit || 'unit',
+                from,
+                to,
+                fareInr: estimateInr,
+                moisturePct,
+              }),
+              CONTACT.phoneE164
+            )}
+            target="_blank"
+            rel="noreferrer"
+            className="block w-full min-h-[52px] rounded-2xl bg-[#25D366] text-white font-extrabold flex items-center justify-center"
+          >
+            WhatsApp: booking confirmation
+          </a>
+          <a
+            href={buildWhatsAppLink(
+              templateTestimonialRequest({ role: 'farmer', what: 'Booking flow + price/moisture info' }),
+              CONTACT.phoneE164
+            )}
+            target="_blank"
+            rel="noreferrer"
+            className="block w-full min-h-[52px] rounded-2xl border-2 border-[var(--saarthi-outline-soft)] bg-white text-[var(--saarthi-primary)] font-extrabold flex items-center justify-center"
+          >
+            WhatsApp: request feedback
+          </a>
+        </div>
       </div>
     );
   }
@@ -204,34 +261,92 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
         </p>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs font-bold text-gray-600">{tV2('v2.maps.pickup')}</label>
-          <select
-            className="w-full mt-1 min-h-[48px] rounded-xl border-2 border-gray-200 px-2 bg-white"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
+      <div className="rounded-3xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-extrabold text-sm">
+            {tV2('v2.maps.pickup')} → {tV2('v2.maps.drop')}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setFrom(to);
+              setTo(from);
+            }}
+            className="min-h-[36px] px-3 rounded-xl border border-[var(--saarthi-outline-soft)] bg-white text-xs font-extrabold text-[var(--saarthi-primary)] inline-flex items-center gap-2"
           >
-            {CITY_OPTIONS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            <ArrowLeftRight className="w-4 h-4" />
+            Swap
+          </button>
         </div>
-        <div>
-          <label className="text-xs font-bold text-gray-600">{tV2('v2.maps.drop')}</label>
-          <select
-            className="w-full mt-1 min-h-[48px] rounded-xl border-2 border-gray-200 px-2 bg-white"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          >
-            {CITY_OPTIONS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-bold text-gray-600">{tV2('v2.maps.pickup')}</label>
+            <div className="mt-1 relative">
+              <select
+                className="w-full min-h-[48px] rounded-xl border-2 border-gray-200 px-2 pr-11 bg-white"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+              >
+                {CITY_OPTIONS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                disabled={listening}
+                onClick={() =>
+                  dictateOnce({
+                    onText: (txt) => {
+                      const q = txt.toLowerCase().trim();
+                      const hit = CITY_OPTIONS.find((c) => c.toLowerCase().includes(q) || q.includes(c.toLowerCase()));
+                      if (hit) setFrom(hit);
+                    },
+                  })
+                }
+                className="absolute right-1 top-1 min-h-[40px] min-w-[40px] rounded-xl bg-[var(--saarthi-primary)] text-white flex items-center justify-center disabled:opacity-60"
+                aria-label="Speak pickup location"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-gray-600">{tV2('v2.maps.drop')}</label>
+            <div className="mt-1 relative">
+              <select
+                className="w-full min-h-[48px] rounded-xl border-2 border-gray-200 px-2 pr-11 bg-white"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+              >
+                {CITY_OPTIONS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                disabled={listening}
+                onClick={() =>
+                  dictateOnce({
+                    onText: (txt) => {
+                      const q = txt.toLowerCase().trim();
+                      const hit = CITY_OPTIONS.find((c) => c.toLowerCase().includes(q) || q.includes(c.toLowerCase()));
+                      if (hit) setTo(hit);
+                    },
+                  })
+                }
+                className="absolute right-1 top-1 min-h-[40px] min-w-[40px] rounded-xl bg-[var(--saarthi-primary)] text-white flex items-center justify-center disabled:opacity-60"
+                aria-label="Speak drop location"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -247,6 +362,81 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
         <p>
           <span className="font-bold">{tV2('v2.maps.estimate')}:</span> ₹{estimateInr}
         </p>
+      </div>
+
+      <PayoutBreakdown
+        title="Fare split (pilot)"
+        split={split}
+        note="Shows how much the driver earns vs platform fee. Pilot assumptions only."
+      />
+
+      <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+        <p className="font-extrabold text-sm">{t('landing.v2.bentoWeather')}</p>
+        <p className="text-xs text-[var(--saarthi-on-surface-variant)] mt-1">
+          {t('landing.v2.bentoWeatherBody')}
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-bold text-gray-600">Moisture (%)</label>
+            <input
+              className="w-full mt-1 min-h-[48px] rounded-xl border-2 border-gray-200 px-3 bg-white"
+              type="number"
+              min={0}
+              max={40}
+              step={0.5}
+              value={moisturePct}
+              onChange={(e) => setMoisturePct(Number(e.target.value) || 0)}
+            />
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-[var(--saarthi-surface-low)] p-3">
+            <p className="text-xs font-bold text-gray-700">Risk band (pilot)</p>
+            <p className="text-sm font-extrabold text-[var(--saarthi-primary)] mt-1">{moisture.band.toUpperCase()}</p>
+            <p className="text-[10px] text-gray-500 mt-1">{moisture.note}</p>
+          </div>
+        </div>
+        <p className="mt-3 text-[10px] text-gray-500">
+          We intentionally avoid numeric deduction estimates until backed by verified mandi-grade datasets.
+        </p>
+      </div>
+
+      <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+        <p className="font-extrabold text-sm">Return truck / fertilizer backhaul</p>
+        <p className="text-xs text-[var(--saarthi-on-surface-variant)] mt-1">
+          If you want a return load (e.g., fertilizer), Saarthi can try to match a backhaul to reduce your net cost.
+        </p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <label className="text-sm font-bold text-gray-700">Need return truck?</label>
+          <button
+            type="button"
+            onClick={() => setNeedReturn((v) => !v)}
+            className={`min-h-[40px] px-4 rounded-full font-extrabold text-sm transition-colors ${
+              needReturn ? 'bg-[var(--saarthi-primary)] text-white' : 'bg-[var(--saarthi-surface-low)] text-[var(--saarthi-on-surface)]'
+            }`}
+          >
+            {needReturn ? 'Yes' : 'No'}
+          </button>
+        </div>
+        {needReturn ? (
+          <div className="mt-3 grid grid-cols-2 gap-3 items-start">
+            <div>
+              <label className="text-xs font-bold text-gray-600">Return load (kg)</label>
+              <input
+                className="w-full mt-1 min-h-[48px] rounded-xl border-2 border-gray-200 px-3 bg-white"
+                type="number"
+                min={50}
+                step={50}
+                value={returnLoadKg}
+                onChange={(e) => setReturnLoadKg(Number(e.target.value) || 50)}
+              />
+              <p className="mt-1 text-[10px] text-gray-500">Example: fertilizer bags.</p>
+            </div>
+            <div className="rounded-2xl border border-gray-100 bg-[var(--saarthi-surface-low)] p-3">
+              <p className="text-xs font-bold text-gray-700">Estimated savings (pilot)</p>
+              <p className="text-2xl font-extrabold text-[var(--saarthi-primary)] mt-1">₹{returnSavingsInr}</p>
+              <p className="text-[10px] text-gray-500 mt-1">Not guaranteed—depends on match availability.</p>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div>

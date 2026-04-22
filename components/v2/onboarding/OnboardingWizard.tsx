@@ -6,12 +6,13 @@ import { useAppState } from '../../../state/AppState';
 import type { Lang } from '../../../i18n/translations';
 import type { SaarthiUserRole } from '../../../types';
 import { requestOtp, verifyOtp } from '../../../services/auth/mockOtp';
-import { MapPin } from 'lucide-react';
+import { MapPin, Mic } from 'lucide-react';
 import { SinglePinLocationMap } from '../maps/SinglePinLocationMap';
 import { MP_CENTER } from '../../../config/mpLocations';
 import { Card, TextField, V2Button, StepIndicator } from '../ui';
+import { useVoiceAssistant } from '../../../voice/VoiceAssistantProvider';
 
-const LANGS: Lang[] = ['hi', 'en', 'kn', 'te'];
+const LANGS: Lang[] = ['hi', 'en', 'kn', 'ta', 'te'];
 
 const PersonaCard: React.FC<{
   label: string;
@@ -36,6 +37,7 @@ export const OnboardingWizard: React.FC = () => {
   const { session, updateSession, clearSession } = useV2Session();
   const { setLang, setUserRole, setCurrentScreen } = useAppState();
   const navigate = useNavigate();
+  const { say, dictateOnce, listening } = useVoiceAssistant();
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState(session.phone || '');
   const [otp, setOtp] = useState('');
@@ -51,6 +53,12 @@ export const OnboardingWizard: React.FC = () => {
       navigate('/app', { replace: true });
     }
   }, [session.onboardingComplete, session.persona, navigate]);
+
+  useEffect(() => {
+    const l = pickLang || lang;
+    if (step === 3) say(l === 'hi' ? 'अपना नाम बोल सकते हैं।' : 'You can speak your name.');
+    if (step === 6) say(l === 'hi' ? 'अपना गाँव या मंडी बोलें।' : 'Speak your village or mandi.');
+  }, [step]);
 
   const goApp = () => {
     setLang(pickLang);
@@ -162,7 +170,23 @@ export const OnboardingWizard: React.FC = () => {
         {step === 3 && (
           <Card className="space-y-4 mt-2">
             <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.onboard.nameTitle')}</h2>
-            <TextField id="name" value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="flex gap-2 items-stretch">
+              <TextField id="name" value={name} onChange={(e) => setName(e.target.value)} className="flex-1" />
+              <button
+                type="button"
+                disabled={listening}
+                onClick={() =>
+                  dictateOnce({
+                    lang: pickLang || lang,
+                    onText: (txt) => setName(txt),
+                  })
+                }
+                className="min-w-[56px] rounded-2xl border-2 border-[var(--saarthi-outline-soft)] bg-white text-[var(--saarthi-primary)] font-extrabold flex items-center justify-center disabled:opacity-60"
+                aria-label="Dictate name"
+              >
+                <Mic className="w-5 h-5" />
+              </button>
+            </div>
             <V2Button type="button" fullWidth variant="primary" onClick={() => name.trim() && setStep(4)} disabled={!name.trim()}>
               {tV2('v2.common.next')}
             </V2Button>
@@ -228,6 +252,20 @@ export const OnboardingWizard: React.FC = () => {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder={tV2('v2.onboard.locationHint')}
               />
+              <button
+                type="button"
+                disabled={listening}
+                onClick={() =>
+                  dictateOnce({
+                    lang: pickLang || lang,
+                    onText: (txt) => setAddress(txt),
+                  })
+                }
+                className="absolute right-2 top-2 min-h-[40px] min-w-[40px] rounded-xl bg-[var(--saarthi-primary)] text-white flex items-center justify-center disabled:opacity-60"
+                aria-label="Dictate location"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
             </div>
             <V2Button type="button" fullWidth variant="outline" onClick={useGps}>
               {tV2('v2.onboard.useGps')}

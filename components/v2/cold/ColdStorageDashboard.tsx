@@ -105,6 +105,38 @@ export const ColdStorageDashboard: React.FC<Props> = ({ view }) => {
     );
   }
 
+  if (view === 'analytics') {
+    const total = slots.reduce((a, s) => a + s.capacityTons, 0);
+    const used = slots.reduce((a, s) => a + s.usedTons, 0);
+    const revenueDay = slots.reduce((a, s) => a + s.usedTons * s.pricePerTonDay, 0);
+    return (
+      <div className="p-4 pb-28 space-y-4">
+        <h2 className="text-lg font-extrabold saarthi-headline">{tV2('v2.cold.occupancy')}</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+            <p className="text-xs text-[var(--saarthi-on-surface-variant)] font-bold">Capacity</p>
+            <p className="text-2xl font-black text-[var(--saarthi-on-background)]">{total}t</p>
+          </div>
+          <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+            <p className="text-xs text-[var(--saarthi-on-surface-variant)] font-bold">Used</p>
+            <p className="text-2xl font-black text-[var(--saarthi-primary)]">{used}t</p>
+          </div>
+          <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+            <p className="text-xs text-[var(--saarthi-on-surface-variant)] font-bold">Occupancy</p>
+            <p className="text-2xl font-black text-[var(--saarthi-primary)]">{occ}%</p>
+          </div>
+          <div className="rounded-2xl bg-white border border-[var(--saarthi-outline-soft)] p-4">
+            <p className="text-xs text-[var(--saarthi-on-surface-variant)] font-bold">Est. revenue/day</p>
+            <p className="text-2xl font-black text-[var(--saarthi-on-background)]">₹{Math.round(revenueDay)}</p>
+          </div>
+        </div>
+        <p className="text-xs text-[var(--saarthi-on-surface-variant)] opacity-80">
+          Demo analytics. Later: connect to bookings, invoices, and sensor compliance.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 pb-28">
       <h2 className="text-lg font-bold">{tV2('v2.logistics.earnings')}</h2>

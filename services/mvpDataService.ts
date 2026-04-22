@@ -1,4 +1,5 @@
 import {
+  BuyerDemand,
   LogisticsJob,
   LogisticsJobStatus,
   Order,
@@ -31,6 +32,17 @@ interface CreatePickupInput {
   dropLocation: string;
   quantity: number;
   unit: ProductUnit;
+  estimatedFareInr?: number;
+}
+
+interface CreateBuyerDemandInput {
+  buyerName: string;
+  buyerLocation: string;
+  crop: string;
+  quantity: number;
+  unit: ProductUnit;
+  priceTarget: number;
+  deliveryWindow: string;
 }
 
 const simulateDelay = async (ms = 250): Promise<void> => {
@@ -78,6 +90,7 @@ const produceStore: ProduceItem[] = [
 const orderStore: Order[] = [];
 const pickupStore: PickupRequest[] = [];
 const logisticsJobStore: LogisticsJob[] = [];
+const buyerDemandStore: BuyerDemand[] = [];
 
 export const listProduce = async (): Promise<ProduceItem[]> => {
   await simulateDelay();
@@ -150,6 +163,7 @@ export const requestPickup = async (input: CreatePickupInput): Promise<PickupReq
     pickupLocation: input.pickupLocation,
     dropLocation: input.dropLocation,
     farmerName: input.farmerName,
+    estimatedFareInr: input.estimatedFareInr,
     status: 'open',
     updatedAt: nowIso(),
   };
@@ -165,6 +179,23 @@ export const listPickupRequests = async (): Promise<PickupRequest[]> => {
 export const listLogisticsJobs = async (): Promise<LogisticsJob[]> => {
   await simulateDelay();
   return [...logisticsJobStore].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+};
+
+export const listBuyerDemands = async (): Promise<BuyerDemand[]> => {
+  await simulateDelay();
+  return [...buyerDemandStore].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+};
+
+export const createBuyerDemand = async (input: CreateBuyerDemandInput): Promise<BuyerDemand> => {
+  await simulateDelay();
+  const d: BuyerDemand = {
+    id: generateId('demand'),
+    createdAt: nowIso(),
+    status: 'open',
+    ...input,
+  };
+  buyerDemandStore.unshift(d);
+  return d;
 };
 
 export const acceptLogisticsJob = async (

@@ -9,6 +9,13 @@ export type MandiPrice = {
   date: string;
 };
 
+export type MandiPricesResult = {
+  prices: MandiPrice[];
+  source: string;
+  lastUpdated: string;
+  isSample: boolean;
+};
+
 const DATAGOV_KEY = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_DATAGOV_API_KEY) || '';
 
 const CROP_HI: Record<string, string> = {
@@ -52,7 +59,20 @@ function fallbackPrices(): MandiPrice[] {
 }
 
 export async function getMandiPrices(state = 'Madhya Pradesh'): Promise<MandiPrice[]> {
-  if (!DATAGOV_KEY) return fallbackPrices();
+  const res = await getMandiPricesResult(state);
+  return res.prices;
+}
+
+export async function getMandiPricesResult(state = 'Madhya Pradesh'): Promise<MandiPricesResult> {
+  if (!DATAGOV_KEY) {
+    const prices = fallbackPrices();
+    return {
+      prices,
+      source: 'Sample dataset (demo)',
+      lastUpdated: prices[0]?.date || todayStr(),
+      isSample: true,
+    };
+  }
 
   try {
     const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${DATAGOV_KEY}&format=json&filters[state]=${encodeURIComponent(state)}&limit=20`;
@@ -60,9 +80,17 @@ export async function getMandiPrices(state = 'Madhya Pradesh'): Promise<MandiPri
     if (!res.ok) throw new Error(`DataGov ${res.status}`);
     const data = await res.json();
     const records: any[] = data?.records ?? [];
-    if (records.length === 0) return fallbackPrices();
+    if (records.length === 0) {
+      const prices = fallbackPrices();
+      return {
+        prices,
+        source: 'Sample dataset (demo)',
+        lastUpdated: prices[0]?.date || todayStr(),
+        isSample: true,
+      };
+    }
 
-    return records.map((r: any) => ({
+    const prices = records.map((r: any) => ({
       crop: r.commodity ?? 'Unknown',
       cropHi: CROP_HI[r.commodity] ?? r.commodity ?? '',
       mandi: r.market ?? r.district ?? '',
@@ -72,8 +100,25 @@ export async function getMandiPrices(state = 'Madhya Pradesh'): Promise<MandiPri
       unit: '₹/क्विंटल',
       date: r.arrival_date ?? todayStr(),
     }));
+
+    const lastUpdated =
+      prices.map((p) => p.date).sort().slice(-1)[0] ||
+      todayStr();
+
+    return {
+      prices,
+      source: 'data.gov.in (APMC mandi rates)',
+      lastUpdated,
+      isSample: false,
+    };
   } catch {
-    return fallbackPrices();
+    const prices = fallbackPrices();
+    return {
+      prices,
+      source: 'Sample dataset (demo)',
+      lastUpdated: prices[0]?.date || todayStr(),
+      isSample: true,
+    };
   }
 }
 

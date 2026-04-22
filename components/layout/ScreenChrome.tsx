@@ -1,5 +1,6 @@
 import React from 'react';
 import { useI18n } from '../../i18n/I18nContext';
+import { SaarthiLogo } from '../SaarthiLogo';
 
 type ScreenChromeProps = {
   children: React.ReactNode;
@@ -9,9 +10,10 @@ type ScreenChromeProps = {
 
 const langOptions = [
   { code: 'hi' as const, label: 'हिं' },
-  { code: 'kn' as const, label: 'ಕನ್' },
-  { code: 'te' as const, label: 'తె' },
   { code: 'en' as const, label: 'EN' },
+  { code: 'kn' as const, label: 'ಕ' },
+  { code: 'ta' as const, label: 'த' },
+  { code: 'te' as const, label: 'తె' },
 ];
 
 export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, title }) => {
@@ -32,7 +34,7 @@ export const ScreenChrome: React.FC<ScreenChromeProps> = ({ children, onBack, ti
             </button>
           ) : (
             <div className="flex items-center gap-1.5 pl-1">
-              <img src="/images/logo.png" alt="Sarthi Setu" className="w-7 h-7 rounded" />
+              <SaarthiLogo size={28} className="rounded" />
               <span className="font-extrabold text-green-800 text-sm leading-none">
                 Sarthi Setu<br />
                 <span className="text-[10px] font-bold text-gray-500">सारथी सेतु</span>

@@ -207,8 +207,9 @@ const en: V2Row = {
 
 const kn: V2Row = { ...en }; // fallback; can refine later
 const te: V2Row = { ...en };
+const ta: V2Row = { ...en };
 
-export const v2Translations: Record<Lang, V2Row> = { hi, en, kn, te };
+export const v2Translations: Record<Lang, V2Row> = { hi, en, kn, te, ta };
 
 export function tV2(lang: Lang, key: V2Key): string {
   return v2Translations[lang][key] ?? v2Translations.en[key] ?? key;

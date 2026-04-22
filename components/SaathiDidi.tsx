@@ -11,20 +11,9 @@ export const SaathiDidi: React.FC = () => {
   const whatsappHref = `https://wa.me/${CONTACT.phoneE164}?text=${encodeURIComponent(CONTACT.whatsappPrefill)}`;
 
   return (
-    <div className="fixed bottom-24 left-4 z-[75] max-w-[260px] flex flex-col gap-2">
-      {/* Mic and WhatsApp buttons above the dialogue card */}
-      <div className="flex gap-2 justify-end">
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
-          className="w-12 h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center border-2 border-white active:scale-95"
-          aria-label="WhatsApp"
-          title="WhatsApp"
-        >
-          <MessageCircle className="w-6 h-6" aria-hidden />
-        </a>
-
+    <div className="fixed bottom-24 right-4 z-[75] max-w-[260px] flex flex-col gap-2">
+      {/* Vertical action dock (won't overlap text) */}
+      <div className="flex flex-col gap-2 items-end">
         <button
           type="button"
           onClick={toggle}
@@ -44,6 +33,17 @@ export const SaathiDidi: React.FC = () => {
             <Mic className="w-6 h-6" />
           )}
         </button>
+
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noreferrer"
+          className="w-12 h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center border-2 border-white active:scale-95"
+          aria-label="WhatsApp"
+          title="WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6" aria-hidden />
+        </a>
       </div>
 
       {/* Saathi Didi dialogue card */}
