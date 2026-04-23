@@ -9,6 +9,8 @@ type VoiceAssistantContextValue = {
   listening: boolean;
   processing: boolean;
   toggle: () => void;
+  say: (text: string) => void;
+  dictateOnce: (opts: { lang?: Lang; onText: (t: string) => void; onError?: (m: string) => void }) => void;
 };
 
 const VoiceAssistantContext = createContext<VoiceAssistantContextValue | null>(null);
@@ -62,6 +64,11 @@ type Intent =
   | 'NAV_PAYMENT'
   | 'NAV_TRACK'
   | 'NAV_COLD'
+  | 'NAV_WEATHER'
+  | 'NAV_ALERTS'
+  | 'NAV_WALLET'
+  | 'NAV_EARNINGS'
+  | 'NAV_STORAGE'
   | 'HELP'
   | 'UNKNOWN';
 
@@ -79,6 +86,10 @@ const parseIntent = (raw: string): Intent => {
   if ((t.includes('mera') || t.includes('meri') || t.includes('मेरा') || t.includes('मेरे')) && (t.includes('order') || t.includes('ऑर्डर'))) {
     return 'NAV_ORDERS';
   }
+  if (t.includes('weather') || t.includes('मौसम') || t.includes('baarish') || t.includes('बारिश')) return 'NAV_WEATHER';
+  if (t.includes('alert') || t.includes('alerts') || t.includes('सूचना') || t.includes('सूचनाएं') || t.includes('scheme') || t.includes('योजना')) {
+    return 'NAV_ALERTS';
+  }
   if (
     (t.includes('fasal') || t.includes('फसल') || t.includes('produce') || t.includes('crops') || t.includes('crop')) &&
     (t.includes('dikhao') || t.includes('show') || t.includes('browse') || t.includes('देखो'))
@@ -93,8 +104,10 @@ const parseIntent = (raw: string): Intent => {
     return 'NAV_NEARBY_BUYERS';
   }
   if (t.includes('payment') || t.includes('भुगतान') || t.includes('pay')) return 'NAV_PAYMENT';
+  if (t.includes('wallet') || t.includes('वॉलेट') || t.includes('balance') || t.includes('बैलेंस')) return 'NAV_WALLET';
+  if (t.includes('earning') || t.includes('earnings') || t.includes('कमाई')) return 'NAV_EARNINGS';
   if (t.includes('track') || t.includes('ट्रैक') || t.includes('shipment')) return 'NAV_TRACK';
-  if (t.includes('cold') || t.includes('कोल्ड') || (t.includes('storage') && t.includes('cold'))) return 'NAV_COLD';
+  if (t.includes('cold') || t.includes('कोल्ड') || t.includes('storage') || t.includes('स्टोरेज')) return 'NAV_STORAGE';
   if (t.includes('madad') || t.includes('मदद') || t.includes('help') || t.includes('sahayata') || t.includes('सहायता'))
     return 'HELP';
 
@@ -102,8 +115,9 @@ const parseIntent = (raw: string): Intent => {
 };
 
 const unknownText = (lang: Lang): string => {
-  if (lang === 'en') return 'Sorry, I did not understand. Say: book vehicle, show jobs, show orders, go to home.';
-  return 'माफ़ कीजिए, मैं समझ नहीं पाया। बोलें: गाड़ी बुक करो, काम दिखाओ, मेरा ऑर्डर दिखाओ, होम जाओ।';
+  if (lang === 'en')
+    return 'Sorry, I did not understand. Try: home, book vehicle, mandi prices, weather, alerts, wallet.';
+  return 'माफ़ कीजिए, मैं समझ नहीं पाया। बोलें: होम, गाड़ी बुक करो, मंडी भाव, मौसम, सूचनाएं, वॉलेट।';
 };
 
 export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -145,13 +159,60 @@ export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = (
     if (intent === 'NAV_BROWSE' && role === 'buyer') return setCurrentDashboardView({ role, view: 'browse' });
     if (intent === 'NAV_ORDERS' && role === 'buyer') return setCurrentDashboardView({ role, view: 'orders' });
     if (intent === 'NAV_PRICES' && role === 'farmer') return setCurrentDashboardView({ role, view: 'prices' });
+    if (intent === 'NAV_WEATHER' && role === 'farmer') return setCurrentDashboardView({ role, view: 'weather' });
+    if (intent === 'NAV_ALERTS' && role === 'farmer') return setCurrentDashboardView({ role, view: 'alerts' });
     if (intent === 'NAV_NEARBY_BUYERS' && role === 'farmer') return setCurrentDashboardView({ role, view: 'nearby_buyers' });
     if (intent === 'NAV_PAYMENT' && (role === 'farmer' || role === 'buyer')) {
       return setCurrentDashboardView({ role, view: 'payments' } as any);
     }
+    if (intent === 'NAV_WALLET' && (role === 'farmer' || role === 'buyer' || role === 'logistics_partner')) {
+      return setCurrentDashboardView({ role, view: 'wallet' } as any);
+    }
+    if (intent === 'NAV_EARNINGS' && role === 'logistics_partner') return setCurrentDashboardView({ role, view: 'earnings' } as any);
     if (intent === 'NAV_TRACK' && role === 'farmer') return setCurrentDashboardView({ role, view: 'track' });
-    if (intent === 'NAV_COLD' && role === 'cold_storage_owner') return setCurrentDashboardView({ role, view: 'slots' });
+    if (intent === 'NAV_STORAGE' && role === 'cold_storage_owner') return setCurrentDashboardView({ role, view: 'slots' });
+    if (intent === 'NAV_STORAGE' && role === 'farmer') return setCurrentDashboardView({ role, view: 'cold_nearby' } as any);
     if (intent === 'HELP') return setCurrentDashboardView({ role, view: 'home' } as any);
+  };
+
+  const say = (out: string) => speak(out, state.lang);
+
+  const dictateOnce = (opts: { lang?: Lang; onText: (t: string) => void; onError?: (m: string) => void }) => {
+    const lang = opts.lang ?? state.lang;
+    const SR = getRecognizer();
+    if (!SR) {
+      opts.onError?.(lang === 'en' ? 'Voice is not supported on this device.' : 'इस डिवाइस में वॉयस सपोर्ट नहीं है।');
+      return;
+    }
+
+    const rec = new SR();
+    recognitionRef.current = rec;
+    rec.lang = langToLocale(lang);
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = () => setListeningState(true);
+    rec.onerror = () => {
+      setListeningState(false);
+      opts.onError?.(lang === 'en' ? 'No voice heard. Try again.' : 'आवाज़ नहीं मिली। फिर से कोशिश करें।');
+    };
+    rec.onend = () => setListeningState(false);
+    rec.onresult = (ev: any) => {
+      const transcript = ev?.results?.[0]?.[0]?.transcript ?? '';
+      const clean = transcript?.trim();
+      if (!clean) {
+        opts.onError?.(lang === 'en' ? 'No text recognized.' : 'कुछ समझ नहीं आया।');
+        return;
+      }
+      opts.onText(clean);
+    };
+
+    try {
+      rec.start();
+    } catch {
+      opts.onError?.(lang === 'en' ? 'Could not start dictation.' : 'डिक्टेशन शुरू नहीं हुआ।');
+    }
   };
 
   const toggle = () => {
@@ -218,8 +279,10 @@ export const VoiceAssistantProvider: React.FC<{ children: React.ReactNode }> = (
       listening: listeningState,
       processing: processingState,
       toggle,
+      say,
+      dictateOnce,
     }),
-    [speakingState, listeningState, processingState]
+    [speakingState, listeningState, processingState, state.lang]
   );
 
   return <VoiceAssistantContext.Provider value={value}>{children}</VoiceAssistantContext.Provider>;

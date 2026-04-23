@@ -25,14 +25,16 @@ export type FarmerDashboardView =
   | 'prices'
   | 'alerts'
   | 'nearby_buyers'
+  | 'buyer_requests'
   | 'cold_nearby'
+  | 'cold_booking'
   | 'wallet'
   | 'payments'
   | 'track';
 
-export type LogisticsDashboardView = 'home' | 'jobs' | 'my_trips' | 'earnings' | 'wallet';
-export type BuyerDashboardView = 'home' | 'browse' | 'orders' | 'wallet' | 'payments';
-export type ColdStorageDashboardView = 'home' | 'slots' | 'requests' | 'earnings';
+export type LogisticsDashboardView = 'home' | 'jobs' | 'nearby_loads' | 'my_trips' | 'earnings' | 'wallet';
+export type BuyerDashboardView = 'home' | 'post_demand' | 'browse' | 'orders' | 'wallet' | 'payments';
+export type ColdStorageDashboardView = 'home' | 'slots' | 'requests' | 'analytics' | 'earnings';
 
 export type SaarthiDashboardView =
   | { role: 'farmer'; view: FarmerDashboardView }
@@ -172,6 +174,7 @@ export interface PickupRequest {
   dropLocation: string;
   quantity: number;
   unit: ProductUnit;
+  estimatedFareInr?: number;
   status: PickupStatus;
   requestedAt: string;
   transporterId?: string;
@@ -202,10 +205,26 @@ export interface LogisticsJob {
   pickupLocation: string;
   dropLocation: string;
   farmerName: string;
+  estimatedFareInr?: number;
   status: LogisticsJobStatus;
   acceptedByTransporterId?: string;
   acceptedByTransporterName?: string;
   updatedAt: string;
+}
+
+export type BuyerDemandStatus = 'open' | 'matched' | 'closed';
+
+export interface BuyerDemand {
+  id: string;
+  buyerName: string;
+  buyerLocation: string;
+  crop: string;
+  quantity: number;
+  unit: ProductUnit;
+  priceTarget: number;
+  deliveryWindow: string;
+  status: BuyerDemandStatus;
+  createdAt: string;
 }
 
 /** V2 persisted session (localStorage) — production-upgradable to JWT */
