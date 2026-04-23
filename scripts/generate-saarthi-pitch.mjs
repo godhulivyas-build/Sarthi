@@ -10,7 +10,28 @@ const ASSETS = {
   logo: path.join(ROOT, "public", "images", "saarthi_setu_logo.png"),
   hero: path.join(ROOT, "public", "images", "hero_farmer.png"),
   bgWide: path.join(ROOT, "public", "images", "bg_wheat_sunset_wide.png"),
+  // Optional: proof photos (use repo copies if present, else fall back to Cursor-attached assets paths)
+  proofMandiClose: path.join(ROOT, "pitch", "assets", "mandi_close.png"),
+  proofMarketWide: path.join(ROOT, "pitch", "assets", "market_wide.png"),
+  proofFieldGroup: path.join(ROOT, "pitch", "assets", "field_group.png"),
+  proofWhatsAppRitesh: path.join(ROOT, "pitch", "assets", "whatsapp_feedback_ritesh.png"),
 };
+
+// Cursor-attached asset fallbacks (safe to keep; makes generator work even if you don't copy assets into repo)
+const CURSOR_ASSETS = {
+  mandiClose:
+    "C:\\Users\\Godhuli Vyas\\.cursor\\projects\\c-Users-Godhuli-Vyas-Downloads-Sarthi-main\\assets\\c__Users_Godhuli_Vyas_AppData_Roaming_Cursor_User_workspaceStorage_6103fa4e9568710c7340a85ba015319e_images_ChatGPT_Image_Apr_22__2026__11_02_20_PM-5e6226cf-ae00-411c-9ccd-b85b4bdc1a0d.png",
+  marketWide:
+    "C:\\Users\\Godhuli Vyas\\.cursor\\projects\\c-Users-Godhuli-Vyas-Downloads-Sarthi-main\\assets\\c__Users_Godhuli_Vyas_AppData_Roaming_Cursor_User_workspaceStorage_6103fa4e9568710c7340a85ba015319e_images_ChatGPT_Image_Apr_22__2026__10_55_03_PM-0dce0397-ae47-4b1b-b879-ffd58db2e6eb.png",
+  fieldGroup:
+    "C:\\Users\\Godhuli Vyas\\.cursor\\projects\\c-Users-Godhuli-Vyas-Downloads-Sarthi-main\\assets\\c__Users_Godhuli_Vyas_AppData_Roaming_Cursor_User_workspaceStorage_6103fa4e9568710c7340a85ba015319e_images_IMG-20260312-WA0006-ea15f281-2d74-409d-8a7d-0929f97f2f50.png",
+  whatsappRitesh:
+    "C:\\Users\\Godhuli Vyas\\.cursor\\projects\\c-Users-Godhuli-Vyas-Downloads-Sarthi-main\\assets\\c__Users_Godhuli_Vyas_AppData_Roaming_Cursor_User_workspaceStorage_6103fa4e9568710c7340a85ba015319e_images_Screenshot_2026-04-11_024815-5a68a971-9423-449f-89ad-4c4955fbdc0d.png",
+};
+
+function pickAsset(repoPath, cursorPath) {
+  return exists(repoPath) ? repoPath : exists(cursorPath) ? cursorPath : null;
+}
 
 function exists(p) {
   try {
@@ -208,6 +229,70 @@ function box(slide, { x, y, w, h, title, body }) {
   }
 }
 
+function quoteCard(slide, { x, y, w, quote, by }) {
+  slide.addShape("roundRect", {
+    x,
+    y,
+    w,
+    h: 1.25,
+    fill: { color: "FFFFFF", transparency: 6 },
+    line: { color: "E7E7E7" },
+    radius: 0.22,
+  });
+  slide.addText(`“${quote}”`, {
+    x: x + 0.3,
+    y: y + 0.2,
+    w: w - 0.6,
+    h: 0.7,
+    fontFace: "Arial",
+    fontSize: 16,
+    italic: true,
+    color: "1F1F1F",
+  });
+  slide.addText(by, {
+    x: x + 0.3,
+    y: y + 0.88,
+    w: w - 0.6,
+    h: 0.3,
+    fontFace: "Arial",
+    fontSize: 12,
+    bold: true,
+    color: "2E7D32",
+  });
+}
+
+function imageTile(slide, { x, y, w, h, img, caption }) {
+  slide.addShape("roundRect", {
+    x,
+    y,
+    w,
+    h,
+    fill: { color: "FFFFFF", transparency: 6 },
+    line: { color: "E7E7E7" },
+    radius: 0.22,
+  });
+  if (img) {
+    slide.addImage({
+      path: img,
+      x: x + 0.12,
+      y: y + 0.12,
+      w: w - 0.24,
+      h: h - 0.42,
+    });
+  }
+  if (caption) {
+    slide.addText(caption, {
+      x: x + 0.18,
+      y: y + h - 0.28,
+      w: w - 0.36,
+      h: 0.25,
+      fontFace: "Arial",
+      fontSize: 11,
+      color: "6B6B6B",
+    });
+  }
+}
+
 function slideTitle(slide, n, t) {
   pill(slide, `SLIDE ${n}`, { x: 0.8, y: 0.55, w: 2.05 });
   slide.addText(t, {
@@ -240,6 +325,10 @@ function main() {
   const bg = exists(ASSETS.bgWide) ? ASSETS.bgWide : null;
   const logo = exists(ASSETS.logo) ? ASSETS.logo : null;
   const hero = exists(ASSETS.hero) ? ASSETS.hero : null;
+  const proofMandiClose = pickAsset(ASSETS.proofMandiClose, CURSOR_ASSETS.mandiClose);
+  const proofMarketWide = pickAsset(ASSETS.proofMarketWide, CURSOR_ASSETS.marketWide);
+  const proofFieldGroup = pickAsset(ASSETS.proofFieldGroup, CURSOR_ASSETS.fieldGroup);
+  const proofWhatsAppRitesh = pickAsset(ASSETS.proofWhatsAppRitesh, CURSOR_ASSETS.whatsappRitesh);
 
   if (bg) must(bg, "background image");
   if (logo) must(logo, "logo image");
@@ -303,25 +392,30 @@ function main() {
 
     box(s, {
       x: 0.8,
-      y: 3.35,
-      w: 6.15,
-      h: 3.2,
+      y: 3.2,
+      w: 6.1,
+      h: 2.55,
       title: "Farmer reality (Bharat)",
       body:
-        "• Distress selling & moisture cuts\n• Long mandi waits + uncertain rates\n• No transparent buyer discovery\n• High/unclear transport costs\n• Storage discovery is hard\n• Low digital confidence",
+        "• Distress selling & moisture cuts\n• Long mandi waits + uncertain rates\n• No transparent buyer discovery\n• High/unclear transport costs\n• Storage discovery is hard",
     });
-    box(s, {
-      x: 7.0,
-      y: 3.35,
-      w: 5.55,
-      h: 3.2,
-      title: "System reality",
-      body:
-        "• Middlemen capture margins\n• Empty-return trucks waste capacity\n• Coordination happens on calls/WhatsApp\n• No single trusted workflow",
+
+    // proof photo tile (mandi)
+    imageTile(s, {
+      x: 7.2,
+      y: 1.95,
+      w: 5.35,
+      h: 3.8,
+      img: proofMarketWide || proofMandiClose,
+      caption: "Ground reality: mandi chaos + coordination gaps",
     });
-    statCard(s, { x: 7.0, y: 2.85, w: 2.7, value: "85%+", title: "Small & marginal farmers", note: "Context for scale" });
-    statCard(s, { x: 9.85, y: 2.85, w: 2.7, value: "Trust", title: "is the bottleneck", note: "not just logistics" });
-    addFooter(s, "Problem discovered through ground research in MP clusters.");
+
+    statCard(s, { x: 0.8, y: 5.9, w: 2.7, value: "85%+", title: "Small & marginal farmers", note: "India context" });
+    statCard(s, { x: 3.65, y: 5.9, w: 2.7, value: "₹2500", title: "50 quintal tractor trip", note: "Field note (MP)" });
+    statCard(s, { x: 6.5, y: 5.9, w: 2.7, value: "Moisture", title: "cuts rates", note: "Quality opacity" });
+    statCard(s, { x: 9.35, y: 5.9, w: 3.2, value: "Trust", title: "is the bottleneck", note: "Repeated feedback" });
+
+    addFooter(s, "All pain points sourced from real farmer conversations (MP clusters).");
   }
 
   // Slide 3 — Why I know this
@@ -337,24 +431,56 @@ function main() {
     statCard(s, { x: 4.45, y: 3.1, w: 3.45, value: "2", title: "MVP iterations", note: "Built fast, improved from feedback" });
     statCard(s, { x: 8.1, y: 3.1, w: 4.45, value: "MP Pilot", title: "Focused geography", note: "Narrow pilot beats broad launch" });
 
-    box(s, {
+    // Proof tiles
+    imageTile(s, {
       x: 0.8,
-      y: 4.45,
-      w: 7.15,
-      h: 2.05,
-      title: "What I learned",
-      body:
-        "• Farmers need simple first actions, not dashboards\n• Trust + coordination matter more than features\n• Buyer network is critical for adoption\n• Voice + local language reduces friction",
+      y: 4.25,
+      w: 3.95,
+      h: 2.75,
+      img: proofFieldGroup,
+      caption: "Field / community sessions",
     });
-    box(s, {
-      x: 8.1,
-      y: 4.45,
-      w: 4.45,
-      h: 2.05,
-      title: "Proof (placeholders)",
-      body: "Add:\n• Field photos\n• WhatsApp chats\n• Testimonials",
+    imageTile(s, {
+      x: 4.95,
+      y: 4.25,
+      w: 3.95,
+      h: 2.75,
+      img: proofMandiClose,
+      caption: "Mandi visits",
     });
-    addFooter(s, "Replace placeholders with your real photos/chats for maximum credibility.");
+    imageTile(s, {
+      x: 9.1,
+      y: 4.25,
+      w: 3.45,
+      h: 2.75,
+      img: proofWhatsAppRitesh,
+      caption: "WhatsApp feedback proof",
+    });
+
+    // Best 3 testimonials (from your interview sheet)
+    quoteCard(s, {
+      x: 0.8,
+      y: 3.15,
+      w: 4.1,
+      quote: "We need online slot booking—otherwise the whole day is wasted in mandi queues.",
+      by: "Deepak Patidar (Wheat farmer, MP)",
+    });
+    quoteCard(s, {
+      x: 5.05,
+      y: 3.15,
+      w: 4.1,
+      quote: "Moisture checks cut rates. We want transparent testing and fair pricing.",
+      by: "Sandeep Mandloi (Wheat farmer, MP)",
+    });
+    quoteCard(s, {
+      x: 9.3,
+      y: 3.15,
+      w: 3.25,
+      quote: "Transport costs are heavy for small farmers—shared pickup would help.",
+      by: "Shubham Patel (Wheat farmer, MP)",
+    });
+
+    addFooter(s, "Proof + testimonials embedded (photos + WhatsApp + farmer quotes).");
   }
 
   // Slide 4 — Solution
