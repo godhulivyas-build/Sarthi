@@ -27,38 +27,38 @@ type Copy = {
 
 const HI_COPY: Copy = {
   title: 'सारथी सेतु पूरे भारत को जोड़ता है',
-  subtitle: 'किसान, खरीदार और ट्रांसपोर्ट — एक ही मंच पर',
+  subtitle: 'खरीदार, किसान और ट्रांसपोर्ट एक साथ',
   steps: [
     {
       k: 0,
       eyebrow: 'स्टेप 1',
-      headline: 'खरीदार — महाराष्ट्र',
-      body: 'मुझे 500 किलो गेहूं चाहिए',
+      headline: 'महाराष्ट्र खरीदार',
+      body: '500 किलो गेहूं चाहिए',
       primary: 'मांग भेजें',
     },
     {
       k: 1,
       eyebrow: 'स्टेप 2',
-      headline: 'रिक्वेस्ट पूरे भारत में चलती है',
-      body: 'महाराष्ट्र → मध्य प्रदेश',
+      headline: 'स्मार्ट मैचिंग',
+      body: 'सारथी सेतु किसान खोज रहा है...',
     },
     {
       k: 2,
       eyebrow: 'स्टेप 3',
-      headline: 'किसान को अलर्ट मिला',
-      body: 'गेहूं चाहिए • नमी: 12% • गुणवत्ता: A ग्रेड',
+      headline: 'मध्य प्रदेश किसान उपलब्ध',
+      body: '500 किलो गेहूं • नमी 12% • तुरंत लोडिंग',
       primary: 'स्वीकार करें',
-      secondary: 'मोलभाव करें',
+      secondary: 'बात करें',
     },
-    { k: 3, eyebrow: 'स्टेप 4', headline: 'सौदा पक्का', body: 'हैंडशेक • भरोसा • पुष्टि' },
+    { k: 3, eyebrow: 'स्टेप 4', headline: 'लॉजिस्टिक्स', body: 'नज़दीकी ट्रक उपलब्ध — एक चुनें' },
     {
       k: 4,
       eyebrow: 'स्टेप 5',
-      headline: 'ट्रांसपोर्ट बुकिंग शुरू',
-      body: 'नज़दीकी ड्राइवर दिखते हैं — किसान चुनता है',
+      headline: 'डिलीवरी रूट',
+      body: 'MP → महाराष्ट्र • ट्रक चल रहा है',
     },
-    { k: 5, eyebrow: 'स्टेप 6', headline: 'ट्रक रूट', body: 'MP → महाराष्ट्र • ट्रक चलता है' },
-    { k: 6, eyebrow: 'स्टेप 7', headline: 'भुगतान', body: '₹12,750 प्राप्त • किसान खुश' },
+    { k: 5, eyebrow: 'स्टेप 6', headline: 'डिलीवरी', body: 'डिलीवरी पूर्ण • पुष्टि' },
+    { k: 6, eyebrow: 'स्टेप 7', headline: 'भुगतान', body: '₹12,750 भुगतान सफल' },
   ],
   ctaLine: 'खरीदार ऑर्डर → किसान एक्सेप्ट → ट्रक बुक → डिलीवरी → बेहतर दाम',
   ctaBtn: 'अभी जुड़ें',
@@ -270,6 +270,7 @@ export const HowItWorks3DDemo: React.FC<{ onCtaClick?: () => void; lang?: string
   const pinRef = React.useRef<HTMLDivElement | null>(null);
   const [step, setStep] = React.useState<Step>(0);
   const stepProg = useStepProgress(step);
+  const [selectedCarrier, setSelectedCarrier] = React.useState<'rajesh' | 'mohan' | null>(null);
 
   const copy = HI_COPY; // For now, Hindi-first as requested.
 
@@ -369,6 +370,131 @@ export const HowItWorks3DDemo: React.FC<{ onCtaClick?: () => void; lang?: string
                       </group>
                       <Environment preset="sunset" />
                     </Canvas>
+                  </div>
+
+                  {/* Scene overlays anchored to the 3D map (feels like a live product) */}
+                  <div className="pointer-events-none absolute inset-0">
+                    {/* Scene 1: Buyer demand (Maharashtra) */}
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: 10, scale: 0.98 }}
+                      animate={reduce ? undefined : { opacity: step === 0 ? 1 : 0, y: step === 0 ? 0 : 10, scale: step === 0 ? 1 : 0.98 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute left-6 bottom-8 w-[min(340px,86%)]"
+                    >
+                      <div className="rounded-3xl border border-white/60 bg-white/86 backdrop-blur-xl shadow-sm px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl border border-white/70 bg-white grid place-items-center text-xl">👨‍💼</div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-black text-[var(--saarthi-on-background)]">महाराष्ट्र खरीदार</p>
+                            <p className="mt-1 text-lg font-black text-[var(--saarthi-primary)]">500 किलो गेहूं चाहिए</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 flex justify-end">
+                          <div className="min-h-[42px] px-4 rounded-2xl bg-[var(--saarthi-primary)] text-white font-black grid place-items-center">
+                            मांग भेजें
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Scene 2: Smart matching */}
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: -8 }}
+                      animate={reduce ? undefined : { opacity: step === 1 ? 1 : 0, y: step === 1 ? 0 : -8 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute top-5 left-1/2 -translate-x-1/2 w-[min(520px,92%)]"
+                    >
+                      <div className="rounded-3xl border border-white/60 bg-white/82 backdrop-blur-xl shadow-sm px-4 py-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-black text-[var(--saarthi-on-background)]">सारथी सेतु किसान खोज रहा है...</p>
+                          <motion.span
+                            aria-hidden
+                            className="w-2.5 h-2.5 rounded-full bg-[var(--saarthi-primary)]"
+                            animate={reduce ? undefined : { opacity: [0.25, 1, 0.25] }}
+                            transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Scene 3: Farmer response (MP) */}
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: 10, scale: 0.98 }}
+                      animate={reduce ? undefined : { opacity: step === 2 ? 1 : 0, y: step === 2 ? 0 : 10, scale: step === 2 ? 1 : 0.98 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute right-6 top-16 w-[min(360px,86%)]"
+                    >
+                      <div className="rounded-3xl border border-white/60 bg-white/86 backdrop-blur-xl shadow-sm px-4 py-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-12 rounded-2xl border border-white/70 bg-white grid place-items-center text-xl">🧑‍🌾</div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-black text-[var(--saarthi-on-background)]">मध्य प्रदेश किसान उपलब्ध</p>
+                            <p className="mt-1 text-base font-black text-[var(--saarthi-primary)]">500 किलो गेहूं</p>
+                            <p className="mt-1 text-xs font-bold text-[var(--saarthi-on-surface-variant)]">नमी 12% • तुरंत लोडिंग</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 flex gap-2 justify-end">
+                          <div className="min-h-[40px] px-4 rounded-2xl bg-[var(--saarthi-primary)] text-white font-black grid place-items-center">
+                            स्वीकार करें
+                          </div>
+                          <div className="min-h-[40px] px-4 rounded-2xl bg-white/70 border border-white/70 text-[var(--saarthi-on-surface-variant)] font-black grid place-items-center">
+                            बात करें
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Scene 4: Logistics carriers */}
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: 10 }}
+                      animate={reduce ? undefined : { opacity: step === 3 ? 1 : 0, y: step === 3 ? 0 : 10 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute left-6 top-20 w-[min(420px,92%)] pointer-events-auto"
+                    >
+                      <div className="rounded-3xl border border-white/60 bg-white/86 backdrop-blur-xl shadow-sm px-4 py-4">
+                        <p className="text-sm font-black text-[var(--saarthi-on-background)]">नज़दीकी ट्रक उपलब्ध</p>
+                        <div className="mt-3 grid gap-2">
+                          {[
+                            { id: 'rajesh' as const, name: 'राजेश ट्रांसपोर्ट', km: '5 km' },
+                            { id: 'mohan' as const, name: 'मोहन लॉजिस्टिक्स', km: '8 km' },
+                          ].map((c) => {
+                            const sel = selectedCarrier === c.id;
+                            return (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setSelectedCarrier(c.id)}
+                                className={`w-full text-left rounded-2xl border px-4 py-3 flex items-center justify-between gap-3 ${
+                                  sel ? 'border-[var(--saarthi-primary)] bg-green-50' : 'border-white/70 bg-white/80'
+                                }`}
+                              >
+                                <span className="text-sm font-black text-[var(--saarthi-on-background)]">{c.name}</span>
+                                <span className="text-xs font-black text-[var(--saarthi-primary)]">{c.km}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="mt-2 text-xs font-bold text-[var(--saarthi-on-surface-variant)]">किसान एक ट्रक चुनता है • फिर ट्रक रवाना</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Scene 6: Payment */}
+                    <motion.div
+                      initial={reduce ? false : { opacity: 0, y: 10, scale: 0.98 }}
+                      animate={reduce ? undefined : { opacity: step === 6 ? 1 : 0, y: step === 6 ? 0 : 10, scale: step === 6 ? 1 : 0.98 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute right-6 bottom-10 w-[min(320px,86%)]"
+                    >
+                      <div className="rounded-3xl border border-white/60 bg-white/86 backdrop-blur-xl shadow-sm px-4 py-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-black text-[var(--saarthi-on-background)]">भुगतान</p>
+                            <p className="mt-1 text-lg font-black text-[var(--saarthi-primary)]">₹12,750 भुगतान सफल</p>
+                          </div>
+                          <div className="w-12 h-12 rounded-2xl border border-white/70 bg-white grid place-items-center text-xl">✅</div>
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
 
                   {/* Legend (minimal, 5-second comprehension) */}

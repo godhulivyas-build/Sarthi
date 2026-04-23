@@ -1,28 +1,51 @@
 /* Sarthi Setu V2 — design tokens (Pragati Sangam / Stitch reference) */
 :root {
-  --saarthi-bg: #f7fbf0;
-  --saarthi-surface: #fafaf5;
-  --saarthi-surface-low: #f1f5eb;
-  --saarthi-surface-high: #e5eadf;
-  --saarthi-surface-highest: #e0e4da;
-  --saarthi-on-surface: #181d17;
-  --saarthi-on-surface-variant: #40493d;
-  --saarthi-primary: #0d631b;
-  --saarthi-primary-container: #2e7d32;
+  /* Warm earthy palette – HSL for easy theming */
+  --saarthi-bg: hsl(110, 30%, 95%); /* light background */
+  --saarthi-surface: hsl(110, 25%, 97%);
+  --saarthi-surface-low: hsl(110, 18%, 93%);
+  --saarthi-surface-high: hsl(110, 15%, 90%);
+  --saarthi-surface-highest: hsl(110, 12%, 87%);
+  --saarthi-on-surface: hsl(120, 30%, 12%);
+  --saarthi-on-surface-variant: hsl(120, 15%, 30%);
+  --saarthi-primary: hsl(140, 50%, 33%);
+  --saarthi-primary-container: hsl(140, 45%, 45%);
   --saarthi-on-primary: #ffffff;
-  --saarthi-secondary: #8b5000;
-  --saarthi-secondary-container: #ff9800;
+  --saarthi-secondary: hsl(30, 70%, 27%);
+  --saarthi-secondary-container: hsl(30, 80%, 50%);
   --saarthi-on-secondary: #ffffff;
-  --saarthi-tertiary: #005a8c;
+  --saarthi-tertiary: hsl(210, 70%, 27%);
   --saarthi-tertiary-rgb: 0, 90, 140;
-  --saarthi-outline: #707a6c;
+  --saarthi-outline: hsl(120, 10%, 45%);
   --saarthi-radius-lg: 1.5rem;
   --saarthi-radius-xl: 2rem;
   --saarthi-shadow-float: 0 12px 32px -4px rgba(47, 49, 46, 0.08);
-  --saarthi-on-background: #1a1c19;
+  --saarthi-on-background: hsl(120, 20%, 10%);
   --saarthi-outline-soft: rgba(112, 122, 108, 0.15);
   --saarthi-focus-ring: rgba(13, 99, 27, 0.12);
   --saarthi-glass: rgba(255, 255, 255, 0.72);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+  --saarthi-bg: hsl(120, 5%, 10%);
+  --saarthi-surface: hsl(120, 5%, 12%);
+  --saarthi-surface-low: hsl(120, 4%, 15%);
+  --saarthi-surface-high: hsl(120, 4%, 18%);
+  --saarthi-surface-highest: hsl(120, 4%, 20%);
+  --saarthi-on-surface: hsl(110, 30%, 90%);
+  --saarthi-on-surface-variant: hsl(110, 15%, 70%);
+  --saarthi-primary: hsl(140, 55%, 55%);
+  --saarthi-primary-container: hsl(140, 45%, 65%);
+  --saarthi-on-primary: #111111;
+  --saarthi-secondary: hsl(30, 80%, 60%);
+  --saarthi-secondary-container: hsl(30, 70%, 70%);
+  --saarthi-on-secondary: #111111;
+  --saarthi-tertiary: hsl(210, 70%, 55%);
+  --saarthi-outline: hsl(110, 10%, 55%);
+  --saarthi-outline-soft: rgba(255, 255, 255, 0.15);
+  --saarthi-focus-ring: rgba(100, 200, 150, 0.12);
+  --saarthi-glass: rgba(0, 0, 0, 0.48);
 }
 
 body.saarthi-v2 {
@@ -73,6 +96,7 @@ body.saarthi-v2 {
   border: 1px solid var(--saarthi-outline-soft);
   border-radius: var(--saarthi-radius-xl);
   box-shadow: var(--saarthi-shadow-float);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .saarthi-input {
