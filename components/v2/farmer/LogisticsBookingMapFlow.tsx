@@ -6,7 +6,7 @@ import { getDistrictByName, LOCATION_NAMES } from '../../../config/mpLocations';
 import { listProduce, requestPickup } from '../../../services/mvpDataService';
 import type { ProduceItem, UserPreferences } from '../../../types';
 import { Button } from '../../ui/Button';
-import { Loader2, MapPinned, Truck, ExternalLink, Mic, ArrowLeftRight } from 'lucide-react';
+import { Loader2, MapPinned, Truck, ExternalLink, Mic, ArrowLeftRight, MapPin } from 'lucide-react';
 import { BookingRouteMapInner } from '../maps/InteractiveBookingMap';
 import { FallbackOsrmLeafletMap } from '../maps/FallbackOsrmLeafletMap';
 import type { LatLng, DrivingRouteResult } from '../../../services/maps/routePlanning';
@@ -301,7 +301,7 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
   const [needRoundTrip, setNeedRoundTrip] = useState(false);
   const [fullTruck, setFullTruck] = useState(true);
   const [sharedLoad, setSharedLoad] = useState(false);
-  const [pickupMode, setPickupMode] = useState<'gps' | 'village' | 'mandi'>('mandi');
+  const [pickupMode, setPickupMode] = useState<'gps' | 'village' | 'mandi' | 'address'>('mandi');
   const [dropMode, setDropMode] = useState<'address' | 'mandi' | 'buyer'>('mandi');
   const [pickupText, setPickupText] = useState('');
   const [dropText, setDropText] = useState('');
@@ -316,8 +316,40 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
 
   useEffect(() => {
     listProduce().then((list) => {
-      setProduce(list);
-      if (list[0]) setProduceId(list[0].id);
+      const now = new Date().toISOString();
+      const seedCrops = (uiLang === 'hi'
+        ? ['गेहूं', 'मक्का', 'प्याज', 'सोयाबीन', 'चना', 'टमाटर', 'आलू', 'सरसों', 'कपास', 'धान']
+        : uiLang === 'kn'
+          ? ['ಗೋಧಿ', 'ಮೆಕ್ಕೆಜೋಳ', 'ಈರುಳ್ಳಿ', 'ಸೋಯಾಬೀನ್', 'ಕಡಲೆ', 'ಟೊಮೇಟೋ', 'ಆಲೂಗಡ್ಡೆ', 'ಸಾಸಿವೆ', 'ಹತ್ತಿ', 'ಅಕ್ಕಿ']
+          : uiLang === 'te'
+            ? ['గోధుమ', 'మొక్కజొన్న', 'ఉల్లిపాయ', 'సోయాబీన్', 'సెనగ', 'టమాట', 'బంగాళాదుంప', 'ఆవాలు', 'పత్తి', 'వరి']
+            : ['Wheat', 'Maize', 'Onion', 'Soybean', 'Chickpea', 'Tomato', 'Potato', 'Mustard', 'Cotton', 'Paddy']) as string[];
+
+      const seeded: ProduceItem[] = seedCrops.map((crop) => ({
+        id: `seed-${crop}`,
+        farmerName: 'Saarthi',
+        farmerLocation: preferences?.location?.trim() || 'India',
+        crop,
+        quantity: 0,
+        unit: 'quintal',
+        pricePerUnit: 0,
+        createdAt: now,
+      }));
+
+      const other: ProduceItem = {
+        id: 'seed-other',
+        farmerName: 'Saarthi',
+        farmerLocation: preferences?.location?.trim() || 'India',
+        crop: uiLang === 'hi' ? 'अन्य लिखें' : uiLang === 'kn' ? 'ಇತರೆ (ಬರೆಯಿರಿ)' : uiLang === 'te' ? 'ఇతర (రాయండి)' : 'Other (type)',
+        quantity: 0,
+        unit: 'quintal',
+        pricePerUnit: 0,
+        createdAt: now,
+      };
+
+      const merged = [...seeded, other, ...list];
+      setProduce(merged);
+      if (merged[0]) setProduceId(merged[0].id);
       setLoading(false);
     });
   }, []);
@@ -508,6 +540,8 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
         setPickAdjust(ll);
         setPickupMode('gps');
         setFrom(uiLang === 'hi' ? 'मेरी लोकेशन' : uiLang === 'kn' ? 'ನನ್ನ ಲೊಕೇಶನ್' : uiLang === 'te' ? 'నా లొకేషన్' : 'My location');
+        // Minimal human-readable autofill (no reverse-geocode in MVP)
+        setPickupText(uiLang === 'hi' ? 'ग्राम पिपलिया, इंदौर, मध्य प्रदेश' : uiLang === 'kn' ? 'ಪಿಪಲಿಯಾ ಗ್ರಾಮ, ಇಂದೋರ್, ಮಧ್ಯ ಪ್ರದೇಶ' : uiLang === 'te' ? 'పిప్లియా గ్రామం, ఇండోర్, మధ్యప్రదేశ్' : 'Pipliya village, Indore, MP');
       },
       () => {
         setGeoError(uiLang === 'hi' ? 'लोकेशन अनुमति नहीं मिली' : uiLang === 'kn' ? 'ಲೊಕೇಶನ್ ಅನುಮತಿ ಇಲ್ಲ' : uiLang === 'te' ? 'లొకేషన్ అనుమతి లేదు' : 'Location permission denied');
@@ -580,11 +614,7 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
         <div>
           <p className="text-sm font-black text-[var(--saarthi-on-background)]">{L('pickupMethods')}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={useMyLocation}
-              className="min-h-[48px] px-4 rounded-2xl bg-[var(--saarthi-primary)] text-white font-black shadow-sm"
-            >
+            <button type="button" onClick={useMyLocation} className="min-h-[48px] px-4 rounded-2xl bg-[var(--saarthi-primary)] text-white font-black shadow-sm">
               {L('useMyLocation')}
             </button>
             <button
@@ -605,11 +635,33 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
             >
               {L('selectMandi')}
             </button>
+            <button
+              type="button"
+              onClick={() => setPickupMode('address')}
+              className={`min-h-[48px] px-4 rounded-2xl border font-black ${
+                pickupMode === 'address' ? 'border-[var(--saarthi-primary)] bg-green-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {L('manualAddress')}
+            </button>
           </div>
           {geoError ? <p className="mt-2 text-xs font-bold text-red-600">{geoError}</p> : null}
 
           <div className="mt-3">
-            {pickupMode === 'village' ? (
+            {pickupMode === 'gps' ? (
+              <div className="rounded-2xl border border-gray-200 bg-[var(--saarthi-surface-low)] px-4 py-3">
+                <p className="text-xs font-extrabold text-[var(--saarthi-on-surface-variant)]">आपका स्थान</p>
+                <div className="mt-2 flex items-start gap-2">
+                  <MapPin className="w-5 h-5 text-[var(--saarthi-primary)] mt-0.5 shrink-0" />
+                  <input
+                    value={pickupText}
+                    onChange={(e) => setPickupText(e.target.value)}
+                    className="w-full min-h-[44px] rounded-2xl border border-gray-200 bg-white px-3 font-bold"
+                    aria-label="आपका स्थान"
+                  />
+                </div>
+              </div>
+            ) : pickupMode === 'village' ? (
               <div className="relative">
                 <input
                   value={pickupText}
@@ -631,6 +683,13 @@ export const LogisticsBookingMapFlow: React.FC<Props> = ({ preferences, onDone }
                   <Mic className="w-4 h-4" />
                 </button>
               </div>
+            ) : pickupMode === 'address' ? (
+              <input
+                value={pickupText}
+                onChange={(e) => setPickupText(e.target.value)}
+                placeholder={L('manualAddress')}
+                className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 px-4 bg-white"
+              />
             ) : pickupMode === 'mandi' ? (
               <select
                 className="w-full min-h-[52px] rounded-2xl border-2 border-gray-200 px-4 bg-white"
