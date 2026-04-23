@@ -364,6 +364,184 @@ export const LandingPage: React.FC = () => {
     );
   };
 
+  const UspCards: React.FC = () => {
+    const ref = React.useRef<HTMLDivElement | null>(null);
+    const inView = useInView(ref, { amount: 0.25, once: true });
+
+    const itemsByLang: Record<Lang, { t: string; d: string }[]> = {
+      hi: [
+        { t: 'ऑनलाइन स्लॉट / टोकन', d: 'मंडी लाइन में समय बचे' },
+        { t: 'नमी कटौती पारदर्शी', d: 'फेयर टेस्टिंग + रिपोर्ट' },
+        { t: 'शेयर ट्रांसपोर्ट', d: 'छोटे किसानों का खर्च घटे' },
+        { t: 'लाइव मंडी भाव', d: 'जाने बिना घर से न निकले' },
+        { t: 'सीधा खरीदार', d: 'बिना बिचौलिया बेहतर दाम' },
+        { t: 'WhatsApp सपोर्ट', d: 'कम डिजिटल यूज़र्स के लिए' },
+      ],
+      en: [
+        { t: 'Slot / token booking', d: 'Save hours in mandi queues' },
+        { t: 'Transparent moisture cuts', d: 'Fair testing + report' },
+        { t: 'Shared transport', d: 'Lower cost for small farmers' },
+        { t: 'Live market rates', d: 'Know price before dispatch' },
+        { t: 'Direct buyers', d: 'Better prices without middlemen' },
+        { t: 'WhatsApp support', d: 'Designed for Bharat onboarding' },
+      ],
+      kn: [
+        { t: 'ಸ್ಲಾಟ್ / ಟೋಕನ್ ಬುಕಿಂಗ್', d: 'ಮಂಡಿ ಸಾಲಿನಲ್ಲಿ ಸಮಯ ಉಳಿಸಿ' },
+        { t: 'ತೇವ ಕಡಿತ ಪಾರದರ್ಶಕ', d: 'ನ್ಯಾಯವಾದ ಪರೀಕ್ಷೆ + ವರದಿ' },
+        { t: 'ಹಂಚಿಕೆ ಸಾರಿಗೆ', d: 'ಸಣ್ಣ ರೈತರಿಗೆ ಕಡಿಮೆ ವೆಚ್ಚ' },
+        { t: 'ಲೈವ್ ಮಂಡಿ ದರ', d: 'ಹೋಗುವ ಮೊದಲು ದರ ತಿಳಿದುಕೊಳ್ಳಿ' },
+        { t: 'ನೇರ ಖರೀದಿದಾರರು', d: 'ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲದೆ ಉತ್ತಮ ದರ' },
+        { t: 'WhatsApp ಸಹಾಯ', d: 'ಸರಳ onboarding' },
+      ],
+      te: [
+        { t: 'స్లాట్ / టోకెన్ బుకింగ్', d: 'మండీ క్యూ సమయం తగ్గుతుంది' },
+        { t: 'తేమ కట్ పారదర్శకం', d: 'ఫెయిర్ టెస్టింగ్ + రిపోర్ట్' },
+        { t: 'షేర్డ్ ట్రాన్స్‌పోర్ట్', d: 'చిన్న రైతులకు తక్కువ ఖర్చు' },
+        { t: 'లైవ్ మండీ ధరలు', d: 'బయలుదేరే ముందు ధర తెలుసుకోండి' },
+        { t: 'డైరెక్ట్ బయ్యర్స్', d: 'మధ్యవర్తులు లేకుండా మంచి ధర' },
+        { t: 'WhatsApp సపోర్ట్', d: 'సింపుల్ onboarding' },
+      ],
+    };
+
+    const items = itemsByLang[asLang(lang)];
+
+    return (
+      <section ref={ref} className="px-4 sm:px-6 max-w-7xl mx-auto py-10 sm:py-14">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p className="saarthi-headline text-2xl sm:text-3xl font-black text-[var(--saarthi-on-background)]">
+              {lang === 'hi' ? 'किसानों को यह क्यों चाहिए' : lang === 'en' ? 'Why farmers need this' : lang === 'kn' ? 'ರೈತರಿಗೆ ಇದು ಏಕೆ ಬೇಕು' : 'రైతులకు ఇది ఎందుకు అవసరం'}
+            </p>
+            <p className="mt-2 text-sm text-[var(--saarthi-on-surface-variant)] max-w-2xl">
+              {lang === 'hi' ? 'कम टेक्स्ट, ज़्यादा क्लैरिटी — हर USP एक कार्ड में।' : 'Low text, high clarity — each USP as a card.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map((it, idx) => (
+            <motion.div
+              key={it.t}
+              initial={reduce ? false : { opacity: 0, y: 14 }}
+              whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.4, ease: 'easeOut', delay: reduce ? 0 : idx * 0.04 }}
+              whileHover={reduce ? undefined : { y: -5, scale: 1.01 }}
+              className="rounded-3xl border border-[var(--saarthi-outline-soft)] bg-white/80 backdrop-blur shadow-sm p-5 overflow-hidden relative"
+            >
+              <div aria-hidden className="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[rgba(34,197,94,0.10)] blur-[1px]" />
+              <div aria-hidden className="absolute -left-8 -bottom-8 w-28 h-28 rounded-full bg-[rgba(251,191,36,0.16)] blur-[1px]" />
+              <p className="text-[11px] font-extrabold uppercase tracking-wide text-[var(--saarthi-on-surface-variant)]">
+                {lang === 'hi' ? 'यूएसपी' : 'USP'}
+              </p>
+              <p className="mt-1 text-lg font-black text-[var(--saarthi-on-background)] leading-snug">{it.t}</p>
+              <p className="mt-1 text-sm font-bold text-[var(--saarthi-on-surface-variant)]">{it.d}</p>
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <div className="h-2 flex-1 rounded-full bg-[rgba(24,29,23,0.06)] overflow-hidden">
+                  <motion.div
+                    className="h-full bg-[var(--saarthi-primary)]"
+                    initial={reduce ? undefined : { width: '0%' }}
+                    whileInView={reduce ? undefined : { width: inView ? '100%' : '0%' }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={reduce ? undefined : { duration: 0.8, ease: 'easeOut' }}
+                  />
+                </div>
+                <span className="text-[10px] font-extrabold text-[var(--saarthi-primary)]">
+                  {lang === 'hi' ? 'देखें' : 'See'}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const MandiDashboard: React.FC = () => {
+    const cards = [
+      { crop: lang === 'en' ? 'Wheat' : 'गेहूं', city: lang === 'en' ? 'Indore' : 'इंदौर', price: '₹2450' },
+      { crop: lang === 'en' ? 'Onion' : 'प्याज', city: lang === 'en' ? 'Nashik' : 'नासिक', price: '₹1800' },
+      { crop: lang === 'en' ? 'Maize' : 'मक्का', city: lang === 'en' ? 'Bhopal' : 'भोपाल', price: '₹2100' },
+      { crop: lang === 'en' ? 'Tomato' : 'टमाटर', city: lang === 'en' ? 'Bengaluru' : 'बेंगलुरु', price: '₹1600' },
+    ];
+
+    return (
+      <section ref={mandiRef} id="mandi-bhav" className="scroll-mt-28 px-4 sm:px-6 max-w-7xl mx-auto py-10 sm:py-14">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p className="saarthi-headline text-2xl sm:text-3xl font-black text-[var(--saarthi-on-background)]">
+              {copy.nav.mandi}
+            </p>
+            <p className="mt-2 text-sm text-[var(--saarthi-on-surface-variant)] max-w-2xl">
+              {lang === 'hi' ? 'घर से निकलने से पहले दाम देखें।' : 'Check rates before dispatch.'}
+            </p>
+          </div>
+          <div className="rounded-full bg-white/70 backdrop-blur border border-[var(--saarthi-outline-soft)] px-3 py-2 text-[10px] font-extrabold text-[var(--saarthi-on-surface-variant)]">
+            {lang === 'hi' ? 'डेमो डेटा' : 'Demo data'}
+          </div>
+        </div>
+
+        <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cards.map((c) => (
+            <Card key={`${c.crop}-${c.city}`} className="p-5 bg-white/80 backdrop-blur">
+              <p className="text-[11px] font-extrabold uppercase tracking-wide text-[var(--saarthi-on-surface-variant)]">{c.city}</p>
+              <p className="mt-1 text-lg font-black text-[var(--saarthi-on-background)]">{c.crop}</p>
+              <p className="mt-2 text-2xl font-black text-[var(--saarthi-primary)]">{c.price}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const FarmerJourney: React.FC = () => {
+    const steps =
+      lang === 'hi'
+        ? [
+            { t: '1) खरीदार डिमांड', d: 'क्वालिटी + मात्रा + लोकेशन' },
+            { t: '2) किसान एक्सेप्ट', d: 'एक टैप में कन्फर्म' },
+            { t: '3) ट्रक बुक', d: 'पिकअप → ड्रॉप' },
+            { t: '4) डिलीवरी + पेमेंट', d: 'अपडेट्स + पुष्टि' },
+          ]
+        : [
+            { t: '1) Buyer demand', d: 'Quality + quantity + location' },
+            { t: '2) Farmer accepts', d: 'Confirm in one tap' },
+            { t: '3) Book transport', d: 'Pickup → drop' },
+            { t: '4) Delivery + payment', d: 'Updates + confirmation' },
+          ];
+
+    return (
+      <section ref={journeyRef} className="px-4 sm:px-6 max-w-7xl mx-auto py-10 sm:py-14">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p className="saarthi-headline text-2xl sm:text-3xl font-black text-[var(--saarthi-on-background)]">
+              {lang === 'hi' ? 'किसान की जर्नी' : 'Farmer journey'}
+            </p>
+            <p className="mt-2 text-sm text-[var(--saarthi-on-surface-variant)] max-w-2xl">
+              {lang === 'hi' ? 'डेमो-फ्लो: भरोसा + सरलता।' : 'Demo flow: trust + simplicity.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid md:grid-cols-2 gap-4">
+          {steps.map((s, i) => (
+            <Card key={s.t} className="p-6 bg-white/80 backdrop-blur">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl grid place-items-center bg-[var(--saarthi-surface-low)] border border-[var(--saarthi-outline-soft)] text-[var(--saarthi-primary)] font-black">
+                  {i + 1}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-black text-[var(--saarthi-on-background)]">{s.t}</p>
+                  <p className="mt-1 text-sm font-bold text-[var(--saarthi-on-surface-variant)]">{s.d}</p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <div className="relative min-h-screen pb-28 md:pb-8 text-[var(--saarthi-on-surface)]">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[99] focus:p-4 focus:bg-white focus:rounded-xl">
