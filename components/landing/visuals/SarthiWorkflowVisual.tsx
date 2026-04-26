@@ -9,13 +9,13 @@ type Step = {
   Icon: React.FC<any>;
 };
 
-export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ highlightStep = 1 }) => {
+export const SarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ highlightStep = 1 }) => {
   const { lang } = useI18n();
   const reduce = useReducedMotion();
 
   const text = (k: string): string => {
     const hi: Record<string, string> = {
-      title: 'Saarthi कैसे काम करता है',
+      title: 'Sarthi कैसे काम करता है',
       s1t: 'दाम + नमी जोखिम',
       s1d: 'बेहतर निर्णय, कम कटौती',
       s2t: 'बुकिंग (मैप/माइक)',
@@ -28,7 +28,7 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
       s5d: 'रिक्वेस्ट/कॉल/WhatsApp',
     };
     const en: Record<string, string> = {
-      title: 'How Saarthi works',
+      title: 'How Sarthi works',
       s1t: 'Price + moisture risk',
       s1d: 'Better decisions, fewer deductions',
       s2t: 'Booking (map/mic)',
@@ -41,7 +41,7 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
       s5d: 'Requests / call / WhatsApp',
     };
     const ta: Record<string, string> = {
-      title: 'Saarthi எப்படி வேலை செய்கிறது',
+      title: 'Sarthi எப்படி வேலை செய்கிறது',
       s1t: 'விலை + ஈரப்பத ஆபத்து',
       s1d: 'சிறந்த முடிவுகள், குறைந்த கழிவுகள்',
       s2t: 'புக்கிங் (மேப்/மைக்)',
@@ -54,7 +54,7 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
       s5d: 'ரிக்வெஸ்ட்/கால்/WhatsApp',
     };
     const kn: Record<string, string> = {
-      title: 'Saarthi ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+      title: 'Sarthi ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
       s1t: 'ಬೆಲೆ + ತೇವ ರಿಸ್ಕ್',
       s1d: 'ಉತ್ತಮ ನಿರ್ಧಾರ, ಕಡಿಮೆ ಕಡಿತ',
       s2t: 'ಬುಕಿಂಗ್ (ಮ್ಯಾಪ್/ಮೈಕ್)',
@@ -67,7 +67,7 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
       s5d: 'ರಿಕ್ವೆಸ್ಟ್/ಕಾಲ್/WhatsApp',
     };
     const te: Record<string, string> = {
-      title: 'Saarthi ఎలా పని చేస్తుంది',
+      title: 'Sarthi ఎలా పని చేస్తుంది',
       s1t: 'ధర + తేమ రిస్క్',
       s1d: 'మంచి నిర్ణయం, తక్కువ కట్',
       s2t: 'బుకింగ్ (మ్యాప్/మైక్)',
@@ -99,7 +99,7 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
       transition={{ duration: 0.45, ease: 'easeOut' }}
       className="w-full"
     >
-      <p className="font-extrabold saarthi-headline text-[var(--saarthi-on-background)]">{text('title')}</p>
+      <p className="font-extrabold sarthi-headline text-[var(--sarthi-on-background)]">{text('title')}</p>
 
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-5 gap-3">
         {steps.map((s, idx) => {
@@ -119,26 +119,26 @@ export const SaarthiWorkflowVisual: React.FC<{ highlightStep?: number }> = ({ hi
                     : { y: 0, boxShadow: '0 0 0 rgba(0,0,0,0)' }
               }
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className={`text-left rounded-3xl border p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--saarthi-primary)]/30 ${
+              className={`text-left rounded-3xl border p-4 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--sarthi-primary)]/30 ${
                 active
-                  ? 'bg-white border-[var(--saarthi-primary)]'
-                  : 'bg-[var(--saarthi-surface-low)] border-[var(--saarthi-outline-soft)]'
+                  ? 'bg-white border-[var(--sarthi-primary)]'
+                  : 'bg-[var(--sarthi-surface-low)] border-[var(--sarthi-outline-soft)]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <motion.div
                   animate={reduce ? undefined : active ? { scale: 1.04 } : { scale: 1 }}
                   transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className="w-10 h-10 rounded-2xl bg-[var(--saarthi-primary)]/10 border border-[var(--saarthi-outline-soft)] flex items-center justify-center"
+                  className="w-10 h-10 rounded-2xl bg-[var(--sarthi-primary)]/10 border border-[var(--sarthi-outline-soft)] flex items-center justify-center"
                 >
-                  <s.Icon className="w-5 h-5 text-[var(--saarthi-primary)]" />
+                  <s.Icon className="w-5 h-5 text-[var(--sarthi-primary)]" />
                 </motion.div>
-                <span className="text-[10px] font-extrabold px-2 py-1 rounded-full bg-white border border-[var(--saarthi-outline-soft)] text-[var(--saarthi-on-surface-variant)]">
+                <span className="text-[10px] font-extrabold px-2 py-1 rounded-full bg-white border border-[var(--sarthi-outline-soft)] text-[var(--sarthi-on-surface-variant)]">
                   {n}
                 </span>
               </div>
-              <p className="mt-3 text-xs font-extrabold text-[var(--saarthi-on-background)]">{text(`${s.key}t`)}</p>
-              <p className="mt-1 text-[10px] text-[var(--saarthi-on-surface-variant)]">{text(`${s.key}d`)}</p>
+              <p className="mt-3 text-xs font-extrabold text-[var(--sarthi-on-background)]">{text(`${s.key}t`)}</p>
+              <p className="mt-1 text-[10px] text-[var(--sarthi-on-surface-variant)]">{text(`${s.key}d`)}</p>
             </motion.button>
           );
         })}

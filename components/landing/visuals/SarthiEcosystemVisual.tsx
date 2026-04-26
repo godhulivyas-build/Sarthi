@@ -11,7 +11,7 @@ type Node = {
   y: number;
 };
 
-export const SaarthiEcosystemVisual: React.FC = () => {
+export const SarthiEcosystemVisual: React.FC = () => {
   const { lang } = useI18n();
   const reduce = useReducedMotion();
 
@@ -19,9 +19,9 @@ export const SaarthiEcosystemVisual: React.FC = () => {
   // Later we can move these into i18n keys if you want full dictionary control.
   const text = (k: string): string => {
     const hi: Record<string, string> = {
-      title: 'Saarthi इकोसिस्टम',
+      title: 'Sarthi इकोसिस्टम',
       sub: 'किसान, खरीदार, लॉजिस्टिक्स, स्टोरेज और सपोर्ट—एक फ्लो में',
-      center: 'SAARTHI',
+      center: 'SARTHI',
       farmer: 'किसान',
       buyers: 'खरीदार',
       logistics: 'लॉजिस्टिक्स',
@@ -30,9 +30,9 @@ export const SaarthiEcosystemVisual: React.FC = () => {
       insights: 'इंसाइट्स',
     };
     const en: Record<string, string> = {
-      title: 'Saarthi ecosystem',
+      title: 'Sarthi ecosystem',
       sub: 'Farmer, buyers, logistics, storage and support—connected in one flow',
-      center: 'SAARTHI',
+      center: 'SARTHI',
       farmer: 'Farmer',
       buyers: 'Buyers',
       logistics: 'Logistics',
@@ -41,9 +41,9 @@ export const SaarthiEcosystemVisual: React.FC = () => {
       insights: 'Insights',
     };
     const ta: Record<string, string> = {
-      title: 'Saarthi சூழமைப்பு',
+      title: 'Sarthi சூழமைப்பு',
       sub: 'விவசாயி, வாங்குபவர், லாஜிஸ்டிக்ஸ், சேமிப்பு—ஒரே ஓட்டத்தில்',
-      center: 'SAARTHI',
+      center: 'SARTHI',
       farmer: 'விவசாயி',
       buyers: 'வாங்குபவர்',
       logistics: 'லாஜிஸ்டிக்ஸ்',
@@ -52,9 +52,9 @@ export const SaarthiEcosystemVisual: React.FC = () => {
       insights: 'இன்சைட்ஸ்',
     };
     const kn: Record<string, string> = {
-      title: 'Saarthi ಪರಿಸರ ವ್ಯವಸ್ಥೆ',
+      title: 'Sarthi ಪರಿಸರ ವ್ಯವಸ್ಥೆ',
       sub: 'ರೈತ, ಖರೀದಿದಾರ, ಲಾಜಿಸ್ಟಿಕ್ಸ್, ಸಂಗ್ರಹ—ಒಂದೇ ಫ್ಲೋ',
-      center: 'SAARTHI',
+      center: 'SARTHI',
       farmer: 'ರೈತ',
       buyers: 'ಖರೀದಿದಾರರು',
       logistics: 'ಲಾಜಿಸ್ಟಿಕ್ಸ್',
@@ -63,9 +63,9 @@ export const SaarthiEcosystemVisual: React.FC = () => {
       insights: 'ಇನ್ಸೈಟ್ಸ್',
     };
     const te: Record<string, string> = {
-      title: 'Saarthi ఎకోసిస్టమ్',
+      title: 'Sarthi ఎకోసిస్టమ్',
       sub: 'రైతు, కొనుగోలుదారు, లాజిస్టిక్స్, స్టోరేజ్—ఒకే ఫ్లోలో',
-      center: 'SAARTHI',
+      center: 'SARTHI',
       farmer: 'రైతు',
       buyers: 'కొనుగోలుదారులు',
       logistics: 'లాజిస్టిక్స్',
@@ -96,12 +96,12 @@ export const SaarthiEcosystemVisual: React.FC = () => {
     >
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <p className="font-extrabold saarthi-headline text-[var(--saarthi-on-background)]">{text('title')}</p>
-          <p className="mt-1 text-sm text-[var(--saarthi-on-surface-variant)]">{text('sub')}</p>
+          <p className="font-extrabold sarthi-headline text-[var(--sarthi-on-background)]">{text('title')}</p>
+          <p className="mt-1 text-sm text-[var(--sarthi-on-surface-variant)]">{text('sub')}</p>
         </div>
       </div>
 
-      <div className="mt-5 rounded-3xl overflow-hidden border border-[var(--saarthi-outline-soft)] bg-white">
+      <div className="mt-5 rounded-3xl overflow-hidden border border-[var(--sarthi-outline-soft)] bg-white">
         <div className="p-4 sm:p-5">
           <svg viewBox="0 0 520 320" className="w-full h-auto">
           <defs>
@@ -117,8 +117,8 @@ export const SaarthiEcosystemVisual: React.FC = () => {
               <line x1="260" y1="160" x2={n.x} y2={n.y} stroke="rgba(64,73,61,0.35)" strokeWidth="2" strokeDasharray="6 6" />
               <circle cx={n.x} cy={n.y} r="26" fill="white" stroke="rgba(112,122,108,0.25)" strokeWidth="2" />
               <foreignObject x={n.x - 16} y={n.y - 16} width="32" height="32">
-                <div className="w-8 h-8 rounded-xl bg-[var(--saarthi-surface-low)] flex items-center justify-center">
-                  <n.Icon className="w-4.5 h-4.5 text-[var(--saarthi-primary)]" />
+                <div className="w-8 h-8 rounded-xl bg-[var(--sarthi-surface-low)] flex items-center justify-center">
+                  <n.Icon className="w-4.5 h-4.5 text-[var(--sarthi-primary)]" />
                 </div>
               </foreignObject>
               <text x={n.x} y={n.y + 45} textAnchor="middle" fontSize="11" fontWeight="800" fill="#181d17">

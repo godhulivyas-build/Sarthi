@@ -1,5 +1,5 @@
 {
-  "name": "saarthi",
+  "name": "sarthi",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "pitch:pptx": "node scripts/generate-saarthi-pitch.mjs"
+    "pitch:pptx": "node scripts/generate-sarthi-pitch.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",

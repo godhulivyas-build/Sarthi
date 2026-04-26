@@ -1,11 +1,11 @@
 import React from 'react';
 
-type SaarthiLogoProps = {
+type SarthiLogoProps = {
   size?: number;
   className?: string;
 };
 
-export const SaarthiLogo: React.FC<SaarthiLogoProps> = ({ size = 32, className = '' }) => (
+export const SarthiLogo: React.FC<SarthiLogoProps> = ({ size = 32, className = '' }) => (
   <svg
     width={size}
     height={size}
@@ -13,7 +13,7 @@ export const SaarthiLogo: React.FC<SaarthiLogoProps> = ({ size = 32, className =
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
-    aria-label="Saarthi"
+    aria-label="Sarthi"
   >
     <rect width="48" height="48" rx="12" fill="#16a34a" />
     <text
