@@ -74,3 +74,38 @@ create policy "anyone can self-list produce"
 
 create index if not exists farmer_listings_district_idx on public.farmer_listings (district);
 create index if not exists farmer_listings_crop_idx on public.farmer_listings (crop);
+
+-- Sarthi: Transporters (drivers/vehicle owners who move produce from farm to buyer)
+
+create table if not exists public.transporters (
+  id uuid primary key default gen_random_uuid(),
+  driver_name text not null,
+  vehicle_type text not null check (
+    vehicle_type in ('mini_truck', 'pickup', 'tractor_trolley', 'large_truck', 'auto')
+  ),
+  capacity_quintal double precision not null,
+  price_per_km double precision,
+  price_per_quintal double precision,
+  state text not null,
+  district text not null,
+  village_or_area text,
+  lat double precision,
+  lng double precision,
+  contact_phone text not null,
+  notes text,
+  verified boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.transporters enable row level security;
+
+create policy "transporters are publicly readable"
+  on public.transporters for select
+  using (true);
+
+create policy "anyone can self-register as a transporter"
+  on public.transporters for insert
+  with check (true);
+
+create index if not exists transporters_district_idx on public.transporters (district);

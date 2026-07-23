@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mic, Search, Loader2, MapPin, Phone, Navigation2, Handshake, BadgeCheck, FlaskConical } from 'lucide-react';
+import { Mic, Search, Loader2, MapPin, Phone, Navigation2, Handshake, BadgeCheck, FlaskConical, Store, Star } from 'lucide-react';
 import { useI18n } from '../../i18n/I18nContext';
 import { useVoiceAssistant } from '../../voice/VoiceAssistantProvider';
 import { Card } from '../v2/ui/Card';
@@ -14,6 +14,8 @@ import {
   explainComparison,
   ComparisonResult,
 } from '../../services/discoveryAgentService';
+import { findNearbyRestaurants, DiscoveredPlace } from '../../services/placesDiscovery';
+import { mapsEnabled } from '../../services/maps/googleMapsConfig';
 import { BuyerOnboardingForm } from './BuyerOnboardingForm';
 
 /** Farmer-facing: "I have produce, find nearby buyers." */
@@ -32,6 +34,7 @@ export const SellFlow: React.FC = () => {
   const [explanation, setExplanation] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [nearbyPlaces, setNearbyPlaces] = useState<DiscoveredPlace[]>([]);
 
   const cropLabel = (key: string) => {
     const c = CROP_CATALOG.find((x) => x.key === key);
@@ -44,12 +47,14 @@ export const SellFlow: React.FC = () => {
     setExplanation('');
     try {
       const district = MP_DISTRICTS.find((d) => d.name === districtName) ?? MP_DISTRICTS[0];
-      const [govt, buyers] = await Promise.all([
+      const [govt, buyers, places] = await Promise.all([
         getMandiPriceForCrop(activeCropKey, 'Madhya Pradesh'),
         listBuyersForCrop(activeCropKey, districtName),
+        mapsEnabled() ? findNearbyRestaurants({ lat: district.lat, lng: district.lng }) : Promise.resolve([]),
       ]);
       const comp = buildComparison(govt, buyers, activeCropKey, { lat: district.lat, lng: district.lng });
       setComparison(comp);
+      setNearbyPlaces(places);
 
       const instantText = buildExplanationText(comp, cropLabel(activeCropKey), lang);
       setExplanation(instantText);
@@ -274,6 +279,48 @@ export const SellFlow: React.FC = () => {
                       </a>
                     )}
                   </div>
+                </Card>
+              ))
+            )}
+          </div>
+
+          {/* Google Places — real restaurants/dhabas nearby, never a fabricated price */}
+          <div className="space-y-2">
+            <h2 className="font-bold text-sm uppercase tracking-wide text-slate-600 dark:text-slate-400 px-1 flex items-center gap-1.5">
+              <Store className="w-4 h-4" />
+              {tt('Restaurants & Dhabas Nearby (via Google Maps)', 'आस-पास के रेस्टोरेंट और ढाबे (Google Maps से)')}
+            </h2>
+            {!mapsEnabled() ? (
+              <Card className="text-center text-gray-500 py-6 text-sm">
+                {tt('Google Maps not connected yet — add an API key to see real nearby restaurants.', 'Google Maps अभी जुड़ा नहीं है — असली आस-पास के रेस्टोरेंट देखने के लिए API key जोड़ें।')}
+              </Card>
+            ) : nearbyPlaces.length === 0 ? (
+              <Card className="text-center text-gray-500 py-6 text-sm">
+                {tt('No restaurants found nearby.', 'आस-पास कोई रेस्टोरेंट नहीं मिला।')}
+              </Card>
+            ) : (
+              nearbyPlaces.map((p) => (
+                <Card key={p.placeId} className="space-y-1.5">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <h3 className="font-bold text-[var(--sarthi-on-background)]">{p.name}</h3>
+                      <p className="text-xs text-gray-500">{p.address}</p>
+                    </div>
+                    {p.rating !== null && (
+                      <span className="flex items-center gap-1 text-xs font-bold text-amber-600 shrink-0">
+                        <Star className="w-3.5 h-3.5 fill-current" /> {p.rating} ({p.userRatingsTotal})
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400 italic">{tt('Contact to ask if they buy fresh produce directly.', 'सीधे ताज़ा उपज खरीदते हैं या नहीं, पूछने के लिए संपर्क करें।')}</p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&query_place_id=${p.placeId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full min-h-[44px] rounded-xl bg-[var(--sarthi-surface-low)] font-bold text-sm flex items-center justify-center gap-1.5 border border-[var(--sarthi-outline-soft)]"
+                  >
+                    <Navigation2 className="w-4 h-4" /> {tt('Navigate', 'रास्ता')}
+                  </a>
                 </Card>
               ))
             )}
