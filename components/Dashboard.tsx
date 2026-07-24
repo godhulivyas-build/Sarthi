@@ -5,8 +5,9 @@ import { TransporterDashboard } from './TransporterDashboard';
 import { FarmerDashboard } from './FarmerDashboard';
 
 export const Dashboard: React.FC = () => {
-  const { userRole } = useAppState();
-  
+  const { state } = useAppState();
+  const { userRole } = state;
+
   if (userRole === 'buyer') {
     return <BuyerDashboard />;
   }
