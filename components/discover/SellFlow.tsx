@@ -14,8 +14,7 @@ import {
   explainComparison,
   ComparisonResult,
 } from '../../services/discoveryAgentService';
-import { findNearbyRestaurants, DiscoveredPlace } from '../../services/placesDiscovery';
-import { mapsEnabled } from '../../services/maps/googleMapsConfig';
+import { findNearbyRestaurants, DiscoveredPlace } from '../../services/osmDiscovery';
 import { BuyerOnboardingForm } from './BuyerOnboardingForm';
 
 /** Farmer-facing: "I have produce, find nearby buyers." */
@@ -50,7 +49,7 @@ export const SellFlow: React.FC = () => {
       const [govt, buyers, places] = await Promise.all([
         getMandiPriceForCrop(activeCropKey, 'Madhya Pradesh'),
         listBuyersForCrop(activeCropKey, districtName),
-        mapsEnabled() ? findNearbyRestaurants({ lat: district.lat, lng: district.lng }) : Promise.resolve([]),
+        findNearbyRestaurants({ lat: district.lat, lng: district.lng }),
       ]);
       const comp = buildComparison(govt, buyers, activeCropKey, { lat: district.lat, lng: district.lng });
       setComparison(comp);
@@ -284,17 +283,13 @@ export const SellFlow: React.FC = () => {
             )}
           </div>
 
-          {/* Google Places — real restaurants/dhabas nearby, never a fabricated price */}
+          {/* OpenStreetMap — real restaurants/dhabas nearby, never a fabricated price */}
           <div className="space-y-2">
             <h2 className="font-bold text-sm uppercase tracking-wide text-slate-600 dark:text-slate-400 px-1 flex items-center gap-1.5">
               <Store className="w-4 h-4" />
-              {tt('Restaurants & Dhabas Nearby (via Google Maps)', 'आस-पास के रेस्टोरेंट और ढाबे (Google Maps से)')}
+              {tt('Restaurants & Dhabas Nearby (via OpenStreetMap)', 'आस-पास के रेस्टोरेंट और ढाबे (OpenStreetMap से)')}
             </h2>
-            {!mapsEnabled() ? (
-              <Card className="text-center text-gray-500 py-6 text-sm">
-                {tt('Google Maps not connected yet — add an API key to see real nearby restaurants.', 'Google Maps अभी जुड़ा नहीं है — असली आस-पास के रेस्टोरेंट देखने के लिए API key जोड़ें।')}
-              </Card>
-            ) : nearbyPlaces.length === 0 ? (
+            {nearbyPlaces.length === 0 ? (
               <Card className="text-center text-gray-500 py-6 text-sm">
                 {tt('No restaurants found nearby.', 'आस-पास कोई रेस्टोरेंट नहीं मिला।')}
               </Card>
@@ -314,7 +309,7 @@ export const SellFlow: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-400 italic">{tt('Contact to ask if they buy fresh produce directly.', 'सीधे ताज़ा उपज खरीदते हैं या नहीं, पूछने के लिए संपर्क करें।')}</p>
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&query_place_id=${p.placeId}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full min-h-[44px] rounded-xl bg-[var(--sarthi-surface-low)] font-bold text-sm flex items-center justify-center gap-1.5 border border-[var(--sarthi-outline-soft)]"

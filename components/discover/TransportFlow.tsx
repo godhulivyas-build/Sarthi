@@ -6,8 +6,7 @@ import { MP_DISTRICTS } from '../../config/mpLocations';
 import { VEHICLE_TYPE_LABEL } from '../../services/transporterDirectory';
 import { listTransportersForDistrict } from '../../services/transporterDirectory';
 import { matchTransportersForRoute, TransportMatch } from '../../services/transportMatching';
-import { findNearbyTransportBusinesses, DiscoveredPlace } from '../../services/placesDiscovery';
-import { mapsEnabled } from '../../services/maps/googleMapsConfig';
+import { findNearbyTransportBusinesses, DiscoveredPlace } from '../../services/osmDiscovery';
 import { TransporterOnboardingForm } from './TransporterOnboardingForm';
 
 /** Anyone needing to move produce: farmers arranging pickup, buyers arranging delivery. */
@@ -35,9 +34,7 @@ export const TransportFlow: React.FC = () => {
 
       const [transporters, discovered] = await Promise.all([
         listTransportersForDistrict(), // all districts — a driver based elsewhere may still be closest
-        mapsEnabled()
-          ? findNearbyTransportBusinesses({ lat: pickup.lat, lng: pickup.lng })
-          : Promise.resolve([]),
+        findNearbyTransportBusinesses({ lat: pickup.lat, lng: pickup.lng }),
       ]);
 
       setMatches(matchTransportersForRoute({ lat: pickup.lat, lng: pickup.lng }, { lat: drop.lat, lng: drop.lng }, qty, transporters));
@@ -174,17 +171,13 @@ export const TransportFlow: React.FC = () => {
             )}
           </div>
 
-          {/* Google Places — real transport/logistics businesses, no fabricated price */}
+          {/* OpenStreetMap — real transport/logistics businesses, no fabricated price */}
           <div className="space-y-2">
             <h2 className="font-bold text-sm uppercase tracking-wide text-slate-600 dark:text-slate-400 px-1 flex items-center gap-1.5">
               <Truck className="w-4 h-4" />
-              {tt('Transport Businesses Nearby (via Google Maps)', 'आस-पास के ट्रांसपोर्ट व्यवसाय (Google Maps से)')}
+              {tt('Transport Businesses Nearby (via OpenStreetMap)', 'आस-पास के ट्रांसपोर्ट व्यवसाय (OpenStreetMap से)')}
             </h2>
-            {!mapsEnabled() ? (
-              <Card className="text-center text-gray-500 py-6 text-sm">
-                {tt('Google Maps not connected yet — add an API key to see real nearby transport businesses.', 'Google Maps अभी जुड़ा नहीं है — असली आस-पास के ट्रांसपोर्ट व्यवसाय देखने के लिए API key जोड़ें।')}
-              </Card>
-            ) : places.length === 0 ? (
+            {places.length === 0 ? (
               <Card className="text-center text-gray-500 py-6 text-sm">
                 {tt('No transport businesses found nearby.', 'आस-पास कोई ट्रांसपोर्ट व्यवसाय नहीं मिला।')}
               </Card>
@@ -204,7 +197,7 @@ export const TransportFlow: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-400 italic">{tt('Contact to ask about price and availability.', 'भाव और उपलब्धता के लिए संपर्क करें।')}</p>
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}&query_place_id=${p.placeId}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full min-h-[44px] rounded-xl bg-[var(--sarthi-surface-low)] font-bold text-sm flex items-center justify-center gap-1.5 border border-[var(--sarthi-outline-soft)]"
